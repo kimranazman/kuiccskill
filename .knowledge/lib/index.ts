@@ -31,3 +31,12 @@ export {
   searchPatterns,
 } from './search';
 export type { SearchOptions } from './search';
+
+// Re-export cache operations (fast indexed search)
+export {
+  buildIndex,
+  getIndex,
+  searchFast,
+  invalidateCache,
+} from './cache';
+export type { PatternIndex, PatternMetadata } from './cache';
