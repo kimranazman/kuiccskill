@@ -30,10 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. YAML validation prevents invalid patterns from being saved
   4. 10-20 seed patterns exist across 5+ categories (Layout, Forms, Navigation, Micro-interactions, Data Display)
   5. Each pattern includes metadata: name, category, tags, framework compatibility, accessibility notes
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Schema foundation (Zod schema, directory structure, dependencies)
+- [ ] 01-02-PLAN.md — Storage operations (CRUD, validation, search functions)
+- [ ] 01-03-PLAN.md — Seed patterns (14 patterns across all 7 categories)
 
 ### Phase 2: Code Generation Engine
 **Goal**: Generate framework-specific code from patterns with auto-detection
@@ -109,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Pattern Storage Foundation | 0/0 | Not started | - |
+| 1. Pattern Storage Foundation | 0/3 | Planned | - |
 | 2. Code Generation Engine | 0/0 | Not started | - |
 | 3. Pattern Extraction | 0/0 | Not started | - |
 | 4. Multi-Framework & Documentation | 0/0 | Not started | - |
