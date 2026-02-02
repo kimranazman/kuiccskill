@@ -21,6 +21,34 @@ principles:
   - Color shift provides additional feedback
   - Cubic-bezier easing for natural feel
   - Active state slightly reduces scale for press feedback
+
+documentation:
+  description: "Micro-interaction that provides tactile feedback on button hover with subtle scale, shadow elevation, and color transitions. Creates a satisfying 'lift' effect that makes buttons feel interactive and responsive."
+  usage: "Apply to interactive buttons where visual feedback enhances UX. The hover effect scales up slightly, increases shadow depth, and darkens the background. Active state scales down for press feedback."
+  parameters:
+    - name: scale
+      type: number
+      description: Scale factor on hover (1.0 = no scale)
+      required: false
+      default: "1.05"
+    - name: variant
+      type: "'primary' | 'secondary'"
+      description: Button color variant
+      required: false
+      default: "'primary'"
+  best_practices:
+    - "Keep animations subtle (scale under 1.1) to avoid distraction"
+    - "Use transform and opacity for GPU-accelerated animations"
+    - "Respect prefers-reduced-motion media query"
+    - "Include active state for complete interaction feedback"
+    - "Keep duration short (200ms) for snappy response"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     const Button = ({
@@ -50,6 +78,62 @@ code_examples:
         </button>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    interface Props {
+      variant?: 'primary' | 'secondary';
+    }
+
+    withDefaults(defineProps<Props>(), {
+      variant: 'primary',
+    });
+
+    const variants = {
+      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+      secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
+    };
+    </script>
+    <template>
+      <button
+        :class="[
+          'px-6 py-3 rounded-lg font-medium',
+          'transform transition-all duration-200 ease-out',
+          'hover:scale-105 hover:shadow-lg',
+          'active:scale-95',
+          'focus:outline-none focus:ring-2 focus:ring-offset-2',
+          'motion-reduce:transform-none motion-reduce:transition-none',
+          variants[variant]
+        ]"
+      >
+        <slot />
+      </button>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      export let variant: 'primary' | 'secondary' = 'primary';
+
+      const variants: Record<string, string> = {
+        primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+        secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
+      };
+    </script>
+
+    <button
+      class="
+        px-6 py-3 rounded-lg font-medium
+        transform transition-all duration-200 ease-out
+        hover:scale-105 hover:shadow-lg
+        active:scale-95
+        focus:outline-none focus:ring-2 focus:ring-offset-2
+        motion-reduce:transform-none motion-reduce:transition-none
+        {variants[variant]}
+      "
+    >
+      <slot />
+    </button>
+
   vanilla: >-
     .btn {
       padding: 0.75rem 1.5rem;

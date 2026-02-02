@@ -8,6 +8,8 @@ tags:
   - touch
 frameworks:
   - react
+  - vue
+  - svelte
   - vanilla
 accessibility:
   notes: Ripple is purely visual feedback. Core button functionality must work
@@ -19,6 +21,34 @@ principles:
   - Short duration (300-500ms) for snappy response
   - Contained within button bounds using overflow hidden
   - Remove ripple element after animation completes
+
+documentation:
+  description: "Material Design-inspired click ripple effect that creates a wave of color originating from the click/touch point. Provides satisfying tactile feedback that confirms user interaction with circular expansion and opacity fade."
+  usage: "Wrap any clickable element with RippleButton or apply the ripple effect via CSS and JS. The ripple spawns at the exact click coordinates and expands outward with fading opacity."
+  parameters:
+    - name: color
+      type: string
+      description: Ripple color (typically white with transparency)
+      required: false
+      default: "'rgba(255, 255, 255, 0.3)'"
+    - name: duration
+      type: number
+      description: Ripple animation duration in milliseconds
+      required: false
+      default: "500"
+  best_practices:
+    - "Use overflow:hidden on container to clip ripple bounds"
+    - "Remove ripple elements after animation to prevent DOM buildup"
+    - "Position ripple at exact click coordinates for direct feedback"
+    - "Respect prefers-reduced-motion by disabling animation"
+    - "Use pointer-events:none on ripple to prevent interference"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     import { useState, useRef, MouseEvent } from 'react';
@@ -81,6 +111,91 @@ code_examples:
 
     // keyframes: { ripple: { '0%': { width: '0', height: '0', opacity: '0.5' },
     '100%': { width: '200px', height: '200px', opacity: '0' } } }
+
+  vue: |
+    <script setup lang="ts">
+    import { ref } from 'vue';
+
+    interface Ripple {
+      x: number;
+      y: number;
+      id: number;
+    }
+
+    const ripples = ref<Ripple[]>([]);
+    const buttonRef = ref<HTMLButtonElement | null>(null);
+
+    const addRipple = (e: MouseEvent) => {
+      if (!buttonRef.value) return;
+      const rect = buttonRef.value.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const id = Date.now();
+
+      ripples.value.push({ x, y, id });
+      setTimeout(() => {
+        ripples.value = ripples.value.filter((r) => r.id !== id);
+      }, 500);
+    };
+    </script>
+    <template>
+      <button
+        ref="buttonRef"
+        @click="addRipple"
+        class="relative overflow-hidden px-6 py-3 bg-blue-600 text-white rounded-lg"
+      >
+        <span
+          v-for="ripple in ripples"
+          :key="ripple.id"
+          class="absolute bg-white/30 rounded-full animate-ripple pointer-events-none"
+          :style="{
+            left: ripple.x + 'px',
+            top: ripple.y + 'px',
+            transform: 'translate(-50%, -50%)',
+          }"
+        />
+        <span class="relative z-10"><slot /></span>
+      </button>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      interface Ripple {
+        x: number;
+        y: number;
+        id: number;
+      }
+
+      let ripples: Ripple[] = [];
+      let buttonRef: HTMLButtonElement;
+
+      const addRipple = (e: MouseEvent) => {
+        const rect = buttonRef.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const id = Date.now();
+
+        ripples = [...ripples, { x, y, id }];
+        setTimeout(() => {
+          ripples = ripples.filter((r) => r.id !== id);
+        }, 500);
+      };
+    </script>
+
+    <button
+      bind:this={buttonRef}
+      on:click={addRipple}
+      class="relative overflow-hidden px-6 py-3 bg-blue-600 text-white rounded-lg"
+    >
+      {#each ripples as ripple (ripple.id)}
+        <span
+          class="absolute bg-white/30 rounded-full animate-ripple pointer-events-none"
+          style="left: {ripple.x}px; top: {ripple.y}px; transform: translate(-50%, -50%);"
+        />
+      {/each}
+      <span class="relative z-10"><slot /></span>
+    </button>
+
   vanilla: |-
     .ripple-btn {
       position: relative;
