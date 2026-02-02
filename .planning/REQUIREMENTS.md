@@ -30,20 +30,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Pattern Extraction
 
-- [ ] **EXTR-01**: AI-powered extraction analyzes website HTML/CSS structure
-- [ ] **EXTR-02**: DOM parser converts HTML structure to pattern components
-- [ ] **EXTR-03**: CSS parser extracts styling rules and converts to pattern format
-- [ ] **EXTR-04**: Pattern extraction outputs validated YAML files
-- [ ] **EXTR-05**: Case study generation creates Markdown documentation with design rationale
-- [ ] **EXTR-06**: Extraction identifies animation patterns (transitions, keyframes, timing)
-- [ ] **EXTR-07**: Extraction identifies scroll behaviors (parallax, scroll-triggered animations)
-- [ ] **EXTR-08**: Extraction identifies layout systems (grids, spacing, responsive breakpoints)
-- [ ] **EXTR-09**: Extraction identifies micro-interactions (hover, click feedback, state transitions)
+- [x] **EXTR-01**: AI-powered extraction analyzes website HTML/CSS structure
+- [x] **EXTR-02**: DOM parser converts HTML structure to pattern components
+- [x] **EXTR-03**: CSS parser extracts styling rules and converts to pattern format
+- [x] **EXTR-04**: Pattern extraction outputs validated YAML files
+- [x] **EXTR-05**: Case study generation creates Markdown documentation with design rationale
+- [x] **EXTR-06**: Extraction identifies animation patterns (transitions, keyframes, timing)
+- [x] **EXTR-07**: Extraction identifies scroll behaviors (parallax, scroll-triggered animations)
+- [x] **EXTR-08**: Extraction identifies layout systems (grids, spacing, responsive breakpoints)
+- [x] **EXTR-09**: Extraction identifies micro-interactions (hover, click feedback, state transitions)
 
 ### Integration & Performance
 
 - [ ] **INT-01**: Auto-enhancement integrates with frontend-design skill workflow
-- [ ] **INT-02**: Sub-command `:analyze` triggers pattern extraction from URL
+- [x] **INT-02**: Sub-command `:analyze` triggers pattern extraction from URL
 - [x] **INT-03**: Sub-command `:generate` triggers code generation from stored patterns
 - [ ] **INT-04**: Context-aware suggestions recommend patterns based on current task
 - [ ] **INT-05**: Pattern lookup executes in <100ms (p95 latency)
