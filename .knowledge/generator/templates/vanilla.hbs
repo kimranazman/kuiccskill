@@ -1,3 +1,6 @@
+{{#if code}}
+{{{code}}}
+{{else}}
 /**
  * {{name}}
  *
@@ -10,17 +13,64 @@
 {{#if accessibility}}
  * Accessibility: {{accessibility.notes}}
 {{/if}}
+{{#if documentation}}
+ *
+ * {{documentation.description}}
+{{/if}}
  */
 
-{{#if code}}
-{{{code}}}
-{{else}}
+/* ========================================
+   CSS Styles
+   ======================================== */
+
 .{{slugName}} {
   /*
-   * Implement based on principles:
+   * Base styles - apply principles:
 {{#each principles}}
    * - {{this}}
 {{/each}}
    */
 }
+
+/* Variants and states */
+.{{slugName}}--active {
+  /* Active state styles */
+}
+
+.{{slugName}}--disabled {
+  /* Disabled state styles */
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ========================================
+   JavaScript (optional)
+   ======================================== */
+
+{{#if documentation.parameters}}
+/**
+ * Creates a {{name}} element
+{{#each documentation.parameters}}
+ * @param {{"{"}}{{type}}{{"}"}} {{#unless required}}[{{/unless}}{{name}}{{#unless required}}{{#if default}}={{default}}{{/if}}]{{/unless}} - {{description}}
+{{/each}}
+ * @returns {HTMLElement} The created element
+ */
+function create{{pascalName}}({{#each documentation.parameters}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}) {
+  const el = document.createElement('div');
+  el.className = '{{slugName}}';
+  // Implement based on principles above
+  return el;
+}
+{{else}}
+/**
+ * Creates a {{name}} element
+ * @returns {HTMLElement} The created element
+ */
+function create{{pascalName}}() {
+  const el = document.createElement('div');
+  el.className = '{{slugName}}';
+  // Implement based on principles above
+  return el;
+}
+{{/if}}
 {{/if}}
