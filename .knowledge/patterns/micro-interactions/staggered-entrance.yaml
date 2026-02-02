@@ -1,0 +1,307 @@
+name: Staggered Entrance Animation
+category: micro-interactions
+tags:
+  - animation
+  - entrance
+  - stagger
+  - reveal
+  - cascade
+source:
+  url: https://mindmarket.com
+  extracted: 2026-02-02
+principles:
+  - Use CSS custom properties for delay index (--index)
+  - Calculate delay as base-delay * index for cascade effect
+  - Apply transform and opacity for smooth GPU-accelerated animation
+  - Use IntersectionObserver to trigger only when visible
+  - Keep total animation duration under 1 second for responsiveness
+accessibility:
+  level: AA
+  notes: Respect prefers-reduced-motion by disabling or reducing animation
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: Elements animate in sequence with staggered delays, creating a cascading reveal effect that draws attention and adds visual polish.
+  usage: Apply to lists, grids, or any group of elements that should appear in sequence on page load or scroll into view.
+  parameters:
+    - name: baseDelay
+      type: number
+      default: "100"
+      description: Base delay in ms between each item
+    - name: duration
+      type: number
+      default: "400"
+      description: Animation duration in ms
+  best_practices:
+    - Keep base delay between 50-150ms for natural feel
+    - Limit to 5-8 items to avoid long wait times
+    - Use translateY with opacity for best performance
+    - Trigger on viewport entry, not page load
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import { useEffect, useRef, useState } from 'react';
+    import styles from './StaggeredList.module.css';
+
+    interface StaggeredListProps {
+      children: React.ReactNode[];
+      baseDelay?: number;
+    }
+
+    export function StaggeredList({ children, baseDelay = 100 }: StaggeredListProps) {
+      const [isVisible, setIsVisible] = useState(false);
+      const ref = useRef<HTMLUListElement>(null);
+
+      useEffect(() => {
+        const prefersReducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReducedMotion) {
+          setIsVisible(true);
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setIsVisible(true);
+              observer.disconnect();
+            }
+          },
+          { threshold: 0.1 }
+        );
+
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+      }, []);
+
+      return (
+        <ul ref={ref} className={styles.list}>
+          {children.map((child, index) => (
+            <li
+              key={index}
+              className={`${styles.item} ${isVisible ? styles.visible : ''}`}
+              style={{ '--index': index, '--base-delay': `${baseDelay}ms` } as React.CSSProperties}
+            >
+              {child}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    // StaggeredList.module.css
+    // .list { list-style: none; padding: 0; }
+    // .item {
+    //   opacity: 0;
+    //   transform: translateY(20px);
+    //   transition: opacity 0.4s ease, transform 0.4s ease;
+    //   transition-delay: calc(var(--index) * var(--base-delay));
+    // }
+    // .item.visible {
+    //   opacity: 1;
+    //   transform: translateY(0);
+    // }
+  vue: |
+    <template>
+      <ul ref="listRef" class="staggered-list">
+        <li
+          v-for="(item, index) in items"
+          :key="index"
+          :class="['staggered-item', { visible: isVisible }]"
+          :style="{ '--index': index }"
+        >
+          <slot :item="item" :index="index">{{ item }}</slot>
+        </li>
+      </ul>
+    </template>
+
+    <script setup lang="ts">
+    import { ref, onMounted, onUnmounted } from 'vue';
+
+    defineProps<{
+      items: any[];
+      baseDelay?: number;
+    }>();
+
+    const isVisible = ref(false);
+    const listRef = ref<HTMLUListElement>();
+    let observer: IntersectionObserver;
+
+    onMounted(() => {
+      const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+
+      if (prefersReducedMotion) {
+        isVisible.value = true;
+        return;
+      }
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            isVisible.value = true;
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      if (listRef.value) observer.observe(listRef.value);
+    });
+
+    onUnmounted(() => observer?.disconnect());
+    </script>
+
+    <style scoped>
+    .staggered-list {
+      list-style: none;
+      padding: 0;
+    }
+    .staggered-item {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      transition-delay: calc(var(--index) * 100ms);
+    }
+    .staggered-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { onMount } from 'svelte';
+
+      export let items: any[] = [];
+      export let baseDelay = 100;
+
+      let isVisible = false;
+      let listEl: HTMLUListElement;
+
+      onMount(() => {
+        const prefersReducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReducedMotion) {
+          isVisible = true;
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              isVisible = true;
+              observer.disconnect();
+            }
+          },
+          { threshold: 0.1 }
+        );
+
+        observer.observe(listEl);
+        return () => observer.disconnect();
+      });
+    </script>
+
+    <ul bind:this={listEl} class="staggered-list">
+      {#each items as item, index}
+        <li
+          class="staggered-item"
+          class:visible={isVisible}
+          style="--index: {index}; --base-delay: {baseDelay}ms"
+        >
+          <slot {item} {index}>{item}</slot>
+        </li>
+      {/each}
+    </ul>
+
+    <style>
+      .staggered-list {
+        list-style: none;
+        padding: 0;
+      }
+      .staggered-item {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        transition-delay: calc(var(--index) * var(--base-delay));
+      }
+      .staggered-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <ul class="staggered-list" data-stagger>
+      <li class="staggered-item">Item 1</li>
+      <li class="staggered-item">Item 2</li>
+      <li class="staggered-item">Item 3</li>
+    </ul>
+
+    /* CSS */
+    .staggered-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .staggered-item {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      transition-delay: calc(var(--index, 0) * 100ms);
+    }
+
+    .staggered-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .staggered-item {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+
+    /* JavaScript */
+    function initStaggeredLists() {
+      const lists = document.querySelectorAll('[data-stagger]');
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        lists.forEach(list => {
+          list.querySelectorAll('.staggered-item').forEach(item => {
+            item.classList.add('visible');
+          });
+        });
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const items = entry.target.querySelectorAll('.staggered-item');
+            items.forEach((item, index) => {
+              item.style.setProperty('--index', index);
+              item.classList.add('visible');
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      lists.forEach(list => observer.observe(list));
+    }
+
+    document.addEventListener('DOMContentLoaded', initStaggeredLists);

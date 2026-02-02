@@ -1,0 +1,296 @@
+name: Responsive Card Stack Layout
+category: layout
+tags:
+  - card
+  - grid
+  - responsive
+  - stack
+  - mobile
+source:
+  url: https://mindmarket.com
+  extracted: 2026-02-02
+principles:
+  - Use CSS Grid with auto-fit for responsive columns
+  - Stack vertically on mobile, expand to grid on desktop
+  - Apply consistent gap and padding across breakpoints
+  - Use aspect-ratio for predictable card dimensions
+  - Enable hover states only on devices that support hover
+accessibility:
+  level: AA
+  notes: Ensure cards have proper heading hierarchy and are keyboard navigable
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A responsive card layout that automatically stacks vertically on mobile and arranges in a grid on larger screens, with smooth hover interactions.
+  usage: Use for product grids, article lists, feature showcases, or any collection of similarly-structured content.
+  parameters:
+    - name: minCardWidth
+      type: string
+      default: "280px"
+      description: Minimum card width before wrapping
+    - name: gap
+      type: string
+      default: "1.5rem"
+      description: Gap between cards
+  best_practices:
+    - Use minmax() for fluid card sizing
+    - Apply aspect-ratio to prevent layout shift
+    - Add subtle hover elevation on desktop
+    - Maintain consistent internal padding
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import styles from './CardStack.module.css';
+
+    interface Card {
+      id: string;
+      title: string;
+      description: string;
+      image?: string;
+    }
+
+    interface CardStackProps {
+      cards: Card[];
+      minCardWidth?: string;
+    }
+
+    export function CardStack({ cards, minCardWidth = '280px' }: CardStackProps) {
+      return (
+        <div
+          className={styles.grid}
+          style={{ '--min-card-width': minCardWidth } as React.CSSProperties}
+        >
+          {cards.map((card) => (
+            <article key={card.id} className={styles.card}>
+              {card.image && (
+                <div className={styles.imageWrapper}>
+                  <img src={card.image} alt="" loading="lazy" />
+                </div>
+              )}
+              <div className={styles.content}>
+                <h3 className={styles.title}>{card.title}</h3>
+                <p className={styles.description}>{card.description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      );
+    }
+
+    // CardStack.module.css
+    // .grid {
+    //   display: grid;
+    //   grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
+    //   gap: 1.5rem;
+    // }
+    // .card {
+    //   background: #fff;
+    //   border-radius: 12px;
+    //   overflow: hidden;
+    //   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    //   transition: transform 0.2s ease, box-shadow 0.2s ease;
+    // }
+    // @media (hover: hover) {
+    //   .card:hover {
+    //     transform: translateY(-4px);
+    //     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    //   }
+    // }
+    // .imageWrapper { aspect-ratio: 16 / 9; overflow: hidden; }
+    // .imageWrapper img { width: 100%; height: 100%; object-fit: cover; }
+    // .content { padding: 1.5rem; }
+    // .title { margin: 0 0 0.5rem; font-size: 1.25rem; }
+    // .description { margin: 0; color: #666; }
+  vue: |
+    <template>
+      <div class="card-grid" :style="{ '--min-card-width': minCardWidth }">
+        <article v-for="card in cards" :key="card.id" class="card">
+          <div v-if="card.image" class="image-wrapper">
+            <img :src="card.image" alt="" loading="lazy" />
+          </div>
+          <div class="content">
+            <h3 class="title">{{ card.title }}</h3>
+            <p class="description">{{ card.description }}</p>
+          </div>
+        </article>
+      </div>
+    </template>
+
+    <script setup lang="ts">
+    interface Card {
+      id: string;
+      title: string;
+      description: string;
+      image?: string;
+    }
+
+    withDefaults(defineProps<{
+      cards: Card[];
+      minCardWidth?: string;
+    }>(), {
+      minCardWidth: '280px'
+    });
+    </script>
+
+    <style scoped>
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    @media (hover: hover) {
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      }
+    }
+    .image-wrapper {
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .content { padding: 1.5rem; }
+    .title { margin: 0 0 0.5rem; font-size: 1.25rem; }
+    .description { margin: 0; color: #666; }
+    </style>
+  svelte: |
+    <script lang="ts">
+      interface Card {
+        id: string;
+        title: string;
+        description: string;
+        image?: string;
+      }
+
+      export let cards: Card[] = [];
+      export let minCardWidth = '280px';
+    </script>
+
+    <div class="card-grid" style="--min-card-width: {minCardWidth}">
+      {#each cards as card (card.id)}
+        <article class="card">
+          {#if card.image}
+            <div class="image-wrapper">
+              <img src={card.image} alt="" loading="lazy" />
+            </div>
+          {/if}
+          <div class="content">
+            <h3 class="title">{card.title}</h3>
+            <p class="description">{card.description}</p>
+          </div>
+        </article>
+      {/each}
+    </div>
+
+    <style>
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
+        gap: 1.5rem;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      @media (hover: hover) {
+        .card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+      }
+      .image-wrapper {
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+      }
+      .image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .content { padding: 1.5rem; }
+      .title { margin: 0 0 0.5rem; font-size: 1.25rem; }
+      .description { margin: 0; color: #666; }
+    </style>
+  vanilla: |
+    /* HTML */
+    <div class="card-grid">
+      <article class="card">
+        <div class="card__image">
+          <img src="image.jpg" alt="" loading="lazy" />
+        </div>
+        <div class="card__content">
+          <h3 class="card__title">Card Title</h3>
+          <p class="card__description">Card description goes here.</p>
+        </div>
+      </article>
+      <!-- More cards... -->
+    </div>
+
+    /* CSS */
+    .card-grid {
+      --min-card-width: 280px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    @media (hover: hover) {
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    .card__image {
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    .card__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card__content {
+      padding: 1.5rem;
+    }
+
+    .card__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+    }
+
+    .card__description {
+      margin: 0;
+      color: #666;
+    }

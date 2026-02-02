@@ -1,0 +1,341 @@
+name: Animated Progress Bar
+category: feedback
+tags:
+  - progress
+  - loading
+  - animation
+  - feedback
+  - indicator
+source:
+  url: https://kprverse.com
+  extracted: 2026-02-02
+principles:
+  - Use transform scaleX for smooth GPU-accelerated animation
+  - Set transform-origin to left for natural left-to-right fill
+  - Apply will-change transform for performance optimization
+  - Use CSS transitions for smooth value updates
+  - Provide visual indication of indeterminate state when needed
+accessibility:
+  level: AA
+  notes: Include aria-valuenow, aria-valuemin, aria-valuemax for screen readers
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A smooth, animated progress bar that visually communicates loading or completion status with GPU-accelerated transforms.
+  usage: Use for file uploads, form submissions, page loading, or any process that has measurable progress.
+  parameters:
+    - name: value
+      type: number
+      default: "0"
+      description: Current progress value (0-100)
+    - name: indeterminate
+      type: boolean
+      default: "false"
+      description: Show indeterminate animation when progress is unknown
+  best_practices:
+    - Use scaleX instead of width for smoother animation
+    - Include text label for accessibility
+    - Consider color changes at milestones (50%, 100%)
+    - Add subtle animation for indeterminate state
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import styles from './ProgressBar.module.css';
+
+    interface ProgressBarProps {
+      value: number;
+      label?: string;
+      indeterminate?: boolean;
+    }
+
+    export function ProgressBar({
+      value,
+      label,
+      indeterminate = false
+    }: ProgressBarProps) {
+      const clampedValue = Math.min(100, Math.max(0, value));
+
+      return (
+        <div className={styles.container}>
+          {label && <span className={styles.label}>{label}</span>}
+          <div
+            className={styles.track}
+            role="progressbar"
+            aria-valuenow={indeterminate ? undefined : clampedValue}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className={`${styles.fill} ${indeterminate ? styles.indeterminate : ''}`}
+              style={{ '--progress': clampedValue / 100 } as React.CSSProperties}
+            />
+          </div>
+          {!indeterminate && (
+            <span className={styles.value}>{clampedValue}%</span>
+          )}
+        </div>
+      );
+    }
+
+    // ProgressBar.module.css
+    // .container { display: flex; align-items: center; gap: 0.75rem; }
+    // .label { font-size: 0.875rem; color: #666; }
+    // .track {
+    //   flex: 1;
+    //   height: 8px;
+    //   background: #e5e5e5;
+    //   border-radius: 4px;
+    //   overflow: hidden;
+    // }
+    // .fill {
+    //   height: 100%;
+    //   background: #000;
+    //   border-radius: 4px;
+    //   transform: scaleX(var(--progress, 0));
+    //   transform-origin: left center;
+    //   transition: transform 0.3s ease;
+    //   will-change: transform;
+    // }
+    // .indeterminate {
+    //   animation: indeterminate 1.5s infinite ease-in-out;
+    //   transform-origin: center center;
+    // }
+    // @keyframes indeterminate {
+    //   0% { transform: translateX(-100%) scaleX(0.3); }
+    //   50% { transform: translateX(0) scaleX(0.3); }
+    //   100% { transform: translateX(100%) scaleX(0.3); }
+    // }
+    // .value { font-size: 0.875rem; font-weight: 500; min-width: 3ch; }
+  vue: |
+    <template>
+      <div class="progress-container">
+        <span v-if="label" class="progress-label">{{ label }}</span>
+        <div
+          class="progress-track"
+          role="progressbar"
+          :aria-valuenow="indeterminate ? undefined : clampedValue"
+          :aria-valuemin="0"
+          :aria-valuemax="100"
+        >
+          <div
+            :class="['progress-fill', { indeterminate }]"
+            :style="{ '--progress': clampedValue / 100 }"
+          />
+        </div>
+        <span v-if="!indeterminate" class="progress-value">
+          {{ clampedValue }}%
+        </span>
+      </div>
+    </template>
+
+    <script setup lang="ts">
+    import { computed } from 'vue';
+
+    const props = withDefaults(defineProps<{
+      value: number;
+      label?: string;
+      indeterminate?: boolean;
+    }>(), {
+      indeterminate: false
+    });
+
+    const clampedValue = computed(() =>
+      Math.min(100, Math.max(0, props.value))
+    );
+    </script>
+
+    <style scoped>
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .progress-label {
+      font-size: 0.875rem;
+      color: #666;
+    }
+    .progress-track {
+      flex: 1;
+      height: 8px;
+      background: #e5e5e5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #000;
+      border-radius: 4px;
+      transform: scaleX(var(--progress, 0));
+      transform-origin: left center;
+      transition: transform 0.3s ease;
+      will-change: transform;
+    }
+    .indeterminate {
+      animation: indeterminate 1.5s infinite ease-in-out;
+      transform-origin: center center;
+    }
+    @keyframes indeterminate {
+      0% { transform: translateX(-100%) scaleX(0.3); }
+      50% { transform: translateX(0) scaleX(0.3); }
+      100% { transform: translateX(100%) scaleX(0.3); }
+    }
+    .progress-value {
+      font-size: 0.875rem;
+      font-weight: 500;
+      min-width: 3ch;
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      export let value = 0;
+      export let label = '';
+      export let indeterminate = false;
+
+      $: clampedValue = Math.min(100, Math.max(0, value));
+    </script>
+
+    <div class="progress-container">
+      {#if label}
+        <span class="progress-label">{label}</span>
+      {/if}
+      <div
+        class="progress-track"
+        role="progressbar"
+        aria-valuenow={indeterminate ? undefined : clampedValue}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          class="progress-fill"
+          class:indeterminate
+          style="--progress: {clampedValue / 100}"
+        />
+      </div>
+      {#if !indeterminate}
+        <span class="progress-value">{clampedValue}%</span>
+      {/if}
+    </div>
+
+    <style>
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .progress-label {
+        font-size: 0.875rem;
+        color: #666;
+      }
+      .progress-track {
+        flex: 1;
+        height: 8px;
+        background: #e5e5e5;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: #000;
+        border-radius: 4px;
+        transform: scaleX(var(--progress, 0));
+        transform-origin: left center;
+        transition: transform 0.3s ease;
+        will-change: transform;
+      }
+      .indeterminate {
+        animation: indeterminate 1.5s infinite ease-in-out;
+        transform-origin: center center;
+      }
+      @keyframes indeterminate {
+        0% { transform: translateX(-100%) scaleX(0.3); }
+        50% { transform: translateX(0) scaleX(0.3); }
+        100% { transform: translateX(100%) scaleX(0.3); }
+      }
+      .progress-value {
+        font-size: 0.875rem;
+        font-weight: 500;
+        min-width: 3ch;
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <div class="progress">
+      <span class="progress__label">Loading</span>
+      <div class="progress__track" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress__fill" style="--progress: 0.75"></div>
+      </div>
+      <span class="progress__value">75%</span>
+    </div>
+
+    <!-- Indeterminate -->
+    <div class="progress">
+      <div class="progress__track" role="progressbar">
+        <div class="progress__fill progress__fill--indeterminate"></div>
+      </div>
+    </div>
+
+    /* CSS */
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .progress__label {
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    .progress__track {
+      flex: 1;
+      height: 8px;
+      background: #e5e5e5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress__fill {
+      height: 100%;
+      background: #000;
+      border-radius: 4px;
+      transform: scaleX(var(--progress, 0));
+      transform-origin: left center;
+      transition: transform 0.3s ease;
+      will-change: transform;
+    }
+
+    .progress__fill--indeterminate {
+      animation: progress-indeterminate 1.5s infinite ease-in-out;
+      transform-origin: center center;
+    }
+
+    @keyframes progress-indeterminate {
+      0% { transform: translateX(-100%) scaleX(0.3); }
+      50% { transform: translateX(0) scaleX(0.3); }
+      100% { transform: translateX(100%) scaleX(0.3); }
+    }
+
+    .progress__value {
+      font-size: 0.875rem;
+      font-weight: 500;
+      min-width: 3ch;
+    }
+
+    /* JavaScript for dynamic updates */
+    function updateProgress(element, value) {
+      const fill = element.querySelector('.progress__fill');
+      const valueEl = element.querySelector('.progress__value');
+      const track = element.querySelector('.progress__track');
+
+      const clamped = Math.min(100, Math.max(0, value));
+      fill.style.setProperty('--progress', clamped / 100);
+      track.setAttribute('aria-valuenow', clamped);
+      if (valueEl) valueEl.textContent = `${clamped}%`;
+    }

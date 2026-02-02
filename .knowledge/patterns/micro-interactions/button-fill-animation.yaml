@@ -1,0 +1,263 @@
+name: Button Fill Animation
+category: micro-interactions
+tags:
+  - button
+  - hover
+  - fill
+  - animation
+  - cta
+source:
+  url: https://kprverse.com
+  extracted: 2026-02-02
+principles:
+  - Use pseudo-element for fill layer to avoid layout shifts
+  - Scale transform from 0 to 1 for smooth fill effect
+  - Apply transform-origin to control fill direction
+  - Separate text layer with higher z-index for contrast
+  - Use will-change for GPU acceleration on transform
+accessibility:
+  level: AA
+  notes: Ensure sufficient color contrast in both normal and hover states
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A button with a background that fills in on hover, creating a satisfying visual feedback. The fill can originate from different directions.
+  usage: Apply to primary call-to-action buttons where you want to draw attention and provide clear interactive feedback.
+  parameters:
+    - name: fillDirection
+      type: string
+      default: "left"
+      description: Direction fill originates from (left, right, center, bottom)
+    - name: duration
+      type: string
+      default: "300ms"
+      description: Fill animation duration
+  best_practices:
+    - Ensure text remains readable during transition
+    - Keep animation duration under 400ms
+    - Use contrasting colors for fill and text
+    - Consider reducing motion for accessibility
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import styles from './FillButton.module.css';
+
+    interface FillButtonProps {
+      children: React.ReactNode;
+      onClick?: () => void;
+      fillDirection?: 'left' | 'right' | 'center' | 'bottom';
+    }
+
+    export function FillButton({
+      children,
+      onClick,
+      fillDirection = 'left'
+    }: FillButtonProps) {
+      return (
+        <button
+          className={`${styles.button} ${styles[fillDirection]}`}
+          onClick={onClick}
+        >
+          <span className={styles.fill}></span>
+          <span className={styles.text}>{children}</span>
+        </button>
+      );
+    }
+
+    // FillButton.module.css
+    // .button {
+    //   position: relative;
+    //   padding: 0.75rem 1.5rem;
+    //   border: 2px solid currentColor;
+    //   background: transparent;
+    //   color: #000;
+    //   font-size: 1rem;
+    //   cursor: pointer;
+    //   overflow: hidden;
+    // }
+    // .fill {
+    //   position: absolute;
+    //   inset: 0;
+    //   background: #000;
+    //   transform: scaleX(0);
+    //   transition: transform 0.3s ease;
+    //   z-index: 0;
+    // }
+    // .left .fill { transform-origin: left center; }
+    // .right .fill { transform-origin: right center; }
+    // .center .fill { transform-origin: center center; }
+    // .bottom .fill { transform: scaleY(0); transform-origin: bottom center; }
+    // .button:hover .fill { transform: scaleX(1); }
+    // .bottom:hover .fill { transform: scaleY(1); }
+    // .text {
+    //   position: relative;
+    //   z-index: 1;
+    //   transition: color 0.3s ease;
+    // }
+    // .button:hover .text { color: #fff; }
+  vue: |
+    <template>
+      <button :class="['fill-button', fillDirection]" @click="$emit('click')">
+        <span class="fill"></span>
+        <span class="text"><slot /></span>
+      </button>
+    </template>
+
+    <script setup lang="ts">
+    withDefaults(defineProps<{
+      fillDirection?: 'left' | 'right' | 'center' | 'bottom';
+    }>(), {
+      fillDirection: 'left'
+    });
+
+    defineEmits(['click']);
+    </script>
+
+    <style scoped>
+    .fill-button {
+      position: relative;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid currentColor;
+      background: transparent;
+      color: #000;
+      font-size: 1rem;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .fill {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      z-index: 0;
+    }
+    .left .fill { transform-origin: left center; }
+    .right .fill { transform-origin: right center; }
+    .center .fill { transform-origin: center center; }
+    .bottom .fill {
+      transform: scaleY(0);
+      transform-origin: bottom center;
+    }
+    .fill-button:hover .fill { transform: scaleX(1); }
+    .bottom:hover .fill { transform: scaleY(1); }
+    .text {
+      position: relative;
+      z-index: 1;
+      transition: color 0.3s ease;
+    }
+    .fill-button:hover .text { color: #fff; }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { createEventDispatcher } from 'svelte';
+
+      export let fillDirection: 'left' | 'right' | 'center' | 'bottom' = 'left';
+
+      const dispatch = createEventDispatcher();
+    </script>
+
+    <button
+      class="fill-button {fillDirection}"
+      on:click={() => dispatch('click')}
+    >
+      <span class="fill"></span>
+      <span class="text"><slot /></span>
+    </button>
+
+    <style>
+      .fill-button {
+        position: relative;
+        padding: 0.75rem 1.5rem;
+        border: 2px solid currentColor;
+        background: transparent;
+        color: #000;
+        font-size: 1rem;
+        cursor: pointer;
+        overflow: hidden;
+      }
+      .fill {
+        position: absolute;
+        inset: 0;
+        background: #000;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        z-index: 0;
+      }
+      .left .fill { transform-origin: left center; }
+      .right .fill { transform-origin: right center; }
+      .center .fill { transform-origin: center center; }
+      .bottom .fill {
+        transform: scaleY(0);
+        transform-origin: bottom center;
+      }
+      .fill-button:hover .fill { transform: scaleX(1); }
+      .fill-button.bottom:hover .fill { transform: scaleY(1); }
+      .text {
+        position: relative;
+        z-index: 1;
+        transition: color 0.3s ease;
+      }
+      .fill-button:hover .text { color: #fff; }
+    </style>
+  vanilla: |
+    /* HTML */
+    <button class="fill-button fill-left">
+      <span class="fill-button__bg"></span>
+      <span class="fill-button__text">Click Me</span>
+    </button>
+
+    /* CSS */
+    .fill-button {
+      position: relative;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid currentColor;
+      background: transparent;
+      color: #000;
+      font-size: 1rem;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .fill-button__bg {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      z-index: 0;
+    }
+
+    /* Direction variants */
+    .fill-left .fill-button__bg { transform-origin: left center; }
+    .fill-right .fill-button__bg { transform-origin: right center; }
+    .fill-center .fill-button__bg { transform-origin: center center; }
+    .fill-bottom .fill-button__bg {
+      transform: scaleY(0);
+      transform-origin: bottom center;
+    }
+
+    .fill-button:hover .fill-button__bg { transform: scaleX(1); }
+    .fill-bottom:hover .fill-button__bg { transform: scaleY(1); }
+
+    .fill-button__text {
+      position: relative;
+      z-index: 1;
+      transition: color 0.3s ease;
+    }
+
+    .fill-button:hover .fill-button__text { color: #fff; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fill-button__bg,
+      .fill-button__text {
+        transition: none;
+      }
+    }

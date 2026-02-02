@@ -1,0 +1,299 @@
+name: Sticky Header with Scroll Behavior
+category: navigation
+tags:
+  - header
+  - sticky
+  - navigation
+  - scroll
+  - fixed
+source:
+  url: https://opalcamera.com
+  extracted: 2026-02-02
+principles:
+  - Use position fixed with transform for smooth show/hide
+  - Track scroll direction to show on scroll up, hide on scroll down
+  - Apply backdrop blur for content visibility beneath
+  - Use will-change transform for GPU acceleration
+  - Add transition for smooth appearance changes
+accessibility:
+  level: AA
+  notes: Ensure header remains accessible via keyboard, maintain focus management
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A header that sticks to the top of the viewport and intelligently shows/hides based on scroll direction, saving screen real estate while keeping navigation accessible.
+  usage: Apply to site headers or navigation bars that should remain accessible but not obstruct content during downward scroll.
+  parameters:
+    - name: threshold
+      type: number
+      default: "50"
+      description: Scroll distance before hide behavior activates
+    - name: showOnScrollUp
+      type: boolean
+      default: "true"
+      description: Whether to reveal header when scrolling up
+  best_practices:
+    - Add backdrop-filter blur for modern glass effect
+    - Include subtle shadow when sticky for depth
+    - Ensure sufficient z-index above page content
+    - Debounce scroll handler for performance
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import { useEffect, useState, useRef } from 'react';
+    import styles from './StickyHeader.module.css';
+
+    interface StickyHeaderProps {
+      children: React.ReactNode;
+      threshold?: number;
+    }
+
+    export function StickyHeader({ children, threshold = 50 }: StickyHeaderProps) {
+      const [isVisible, setIsVisible] = useState(true);
+      const [isSticky, setIsSticky] = useState(false);
+      const lastScrollY = useRef(0);
+
+      useEffect(() => {
+        const handleScroll = () => {
+          const currentScrollY = window.scrollY;
+          const isScrollingDown = currentScrollY > lastScrollY.current;
+
+          setIsSticky(currentScrollY > threshold);
+
+          if (currentScrollY > threshold) {
+            setIsVisible(!isScrollingDown);
+          } else {
+            setIsVisible(true);
+          }
+
+          lastScrollY.current = currentScrollY;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, [threshold]);
+
+      return (
+        <header
+          className={`${styles.header} ${isSticky ? styles.sticky : ''} ${
+            isVisible ? styles.visible : styles.hidden
+          }`}
+        >
+          {children}
+        </header>
+      );
+    }
+
+    // StickyHeader.module.css
+    // .header {
+    //   position: fixed;
+    //   top: 0;
+    //   left: 0;
+    //   right: 0;
+    //   z-index: 100;
+    //   transition: transform 0.3s ease;
+    //   will-change: transform;
+    // }
+    // .sticky {
+    //   background: rgba(255, 255, 255, 0.9);
+    //   backdrop-filter: blur(10px);
+    //   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    // }
+    // .visible { transform: translateY(0); }
+    // .hidden { transform: translateY(-100%); }
+  vue: |
+    <template>
+      <header
+        :class="[
+          'sticky-header',
+          { sticky: isSticky, visible: isVisible, hidden: !isVisible }
+        ]"
+      >
+        <slot />
+      </header>
+    </template>
+
+    <script setup lang="ts">
+    import { ref, onMounted, onUnmounted } from 'vue';
+
+    const props = withDefaults(defineProps<{ threshold?: number }>(), {
+      threshold: 50
+    });
+
+    const isVisible = ref(true);
+    const isSticky = ref(false);
+    let lastScrollY = 0;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const isScrollingDown = currentScrollY > lastScrollY;
+
+      isSticky.value = currentScrollY > props.threshold;
+
+      if (currentScrollY > props.threshold) {
+        isVisible.value = !isScrollingDown;
+      } else {
+        isVisible.value = true;
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
+    </script>
+
+    <style scoped>
+    .sticky-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      transition: transform 0.3s ease, background 0.3s ease;
+      will-change: transform;
+    }
+    .sticky {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .visible { transform: translateY(0); }
+    .hidden { transform: translateY(-100%); }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { onMount } from 'svelte';
+
+      export let threshold = 50;
+
+      let isVisible = true;
+      let isSticky = false;
+      let lastScrollY = 0;
+
+      onMount(() => {
+        const handleScroll = () => {
+          const currentScrollY = window.scrollY;
+          const isScrollingDown = currentScrollY > lastScrollY;
+
+          isSticky = currentScrollY > threshold;
+
+          if (currentScrollY > threshold) {
+            isVisible = !isScrollingDown;
+          } else {
+            isVisible = true;
+          }
+
+          lastScrollY = currentScrollY;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+      });
+    </script>
+
+    <header
+      class="sticky-header"
+      class:sticky={isSticky}
+      class:visible={isVisible}
+      class:hidden={!isVisible}
+    >
+      <slot />
+    </header>
+
+    <style>
+      .sticky-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        transition: transform 0.3s ease, background 0.3s ease;
+        will-change: transform;
+      }
+      .sticky {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .visible { transform: translateY(0); }
+      .hidden { transform: translateY(-100%); }
+    </style>
+  vanilla: |
+    /* HTML */
+    <header class="sticky-header" data-sticky-header>
+      <nav>
+        <a href="/">Logo</a>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    /* CSS */
+    .sticky-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      transition: transform 0.3s ease, background 0.3s ease;
+      will-change: transform;
+    }
+
+    .sticky-header.sticky {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .sticky-header.visible {
+      transform: translateY(0);
+    }
+
+    .sticky-header.hidden {
+      transform: translateY(-100%);
+    }
+
+    /* JavaScript */
+    function initStickyHeader(threshold = 50) {
+      const header = document.querySelector('[data-sticky-header]');
+      if (!header) return;
+
+      let lastScrollY = 0;
+
+      const handleScroll = () => {
+        const currentScrollY = window.scrollY;
+        const isScrollingDown = currentScrollY > lastScrollY;
+
+        header.classList.toggle('sticky', currentScrollY > threshold);
+
+        if (currentScrollY > threshold) {
+          header.classList.toggle('visible', !isScrollingDown);
+          header.classList.toggle('hidden', isScrollingDown);
+        } else {
+          header.classList.add('visible');
+          header.classList.remove('hidden');
+        }
+
+        lastScrollY = currentScrollY;
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => initStickyHeader());
