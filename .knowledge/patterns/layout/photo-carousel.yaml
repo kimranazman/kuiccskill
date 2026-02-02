@@ -1,0 +1,354 @@
+name: Photo Carousel with Indicators
+category: layout
+tags:
+  - carousel
+  - gallery
+  - slider
+  - indicators
+  - responsive
+source:
+  url: https://opalcamera.com
+  extracted: 2026-02-02
+principles:
+  - Use CSS scroll-snap for native smooth scrolling
+  - Indicator dots show current position and total count
+  - Lazy load images outside viewport
+  - Touch-friendly swipe gestures on mobile
+  - Keyboard navigation for accessibility
+accessibility:
+  level: AA
+  notes: Include aria-labels, keyboard navigation, and visible focus states
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A horizontal image carousel with dot indicators showing current slide position. Uses native scroll behavior for smooth performance.
+  usage: Product galleries, testimonial sliders, featured content sections.
+  parameters:
+    - name: autoplay
+      type: boolean
+      default: "false"
+      description: Auto-advance slides
+    - name: interval
+      type: number
+      default: "5000"
+      description: Autoplay interval in ms
+  best_practices:
+    - Use scroll-snap for native performance
+    - Provide visible indicators for slide count
+    - Support keyboard arrow navigation
+    - Pause autoplay on hover/focus
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import { useRef, useState, useEffect } from 'react';
+    import styles from './Carousel.module.css';
+
+    interface CarouselProps {
+      images: { src: string; alt: string }[];
+    }
+
+    export function Carousel({ images }: CarouselProps) {
+      const [activeIndex, setActiveIndex] = useState(0);
+      const containerRef = useRef<HTMLUListElement>(null);
+
+      useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const index = Number(entry.target.dataset.index);
+                setActiveIndex(index);
+              }
+            });
+          },
+          { root: container, threshold: 0.5 }
+        );
+
+        container.querySelectorAll('li').forEach((li) => observer.observe(li));
+        return () => observer.disconnect();
+      }, [images]);
+
+      const scrollTo = (index: number) => {
+        containerRef.current?.children[index]?.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center'
+        });
+      };
+
+      return (
+        <div className={styles.carousel}>
+          <ul ref={containerRef} className={styles.slides}>
+            {images.map((img, i) => (
+              <li key={i} data-index={i} className={styles.slide}>
+                <img src={img.src} alt={img.alt} loading="lazy" />
+              </li>
+            ))}
+          </ul>
+          <div className={styles.indicators}>
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => scrollTo(i)}
+                className={`${styles.dot} ${i === activeIndex ? styles.active : ''}`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+  vue: |
+    <template>
+      <div class="carousel">
+        <ul ref="slidesRef" class="slides">
+          <li
+            v-for="(img, i) in images"
+            :key="i"
+            :data-index="i"
+            class="slide"
+          >
+            <img :src="img.src" :alt="img.alt" loading="lazy" />
+          </li>
+        </ul>
+        <div class="indicators">
+          <button
+            v-for="(_, i) in images"
+            :key="i"
+            @click="scrollTo(i)"
+            :class="['dot', { active: i === activeIndex }]"
+            :aria-label="`Go to slide ${i + 1}`"
+          />
+        </div>
+      </div>
+    </template>
+
+    <script setup lang="ts">
+    import { ref, onMounted, onUnmounted } from 'vue';
+
+    defineProps<{
+      images: { src: string; alt: string }[];
+    }>();
+
+    const activeIndex = ref(0);
+    const slidesRef = ref<HTMLUListElement>();
+    let observer: IntersectionObserver;
+
+    const scrollTo = (index: number) => {
+      slidesRef.value?.children[index]?.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center'
+      });
+    };
+
+    onMounted(() => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              activeIndex.value = Number((entry.target as HTMLElement).dataset.index);
+            }
+          });
+        },
+        { root: slidesRef.value, threshold: 0.5 }
+      );
+      slidesRef.value?.querySelectorAll('li').forEach((li) => observer.observe(li));
+    });
+
+    onUnmounted(() => observer?.disconnect());
+    </script>
+
+    <style scoped>
+    .carousel { position: relative; }
+    .slides {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .slide {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+    }
+    .indicators {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      border: none;
+      cursor: pointer;
+    }
+    .dot.active { background: #000; }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { onMount } from 'svelte';
+
+      export let images: { src: string; alt: string }[] = [];
+
+      let activeIndex = 0;
+      let slidesEl: HTMLUListElement;
+
+      const scrollTo = (index: number) => {
+        slidesEl?.children[index]?.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center'
+        });
+      };
+
+      onMount(() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                activeIndex = Number((entry.target as HTMLElement).dataset.index);
+              }
+            });
+          },
+          { root: slidesEl, threshold: 0.5 }
+        );
+
+        slidesEl.querySelectorAll('li').forEach((li) => observer.observe(li));
+        return () => observer.disconnect();
+      });
+    </script>
+
+    <div class="carousel">
+      <ul bind:this={slidesEl} class="slides">
+        {#each images as img, i}
+          <li data-index={i} class="slide">
+            <img src={img.src} alt={img.alt} loading="lazy" />
+          </li>
+        {/each}
+      </ul>
+      <div class="indicators">
+        {#each images as _, i}
+          <button
+            on:click={() => scrollTo(i)}
+            class="dot"
+            class:active={i === activeIndex}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        {/each}
+      </div>
+    </div>
+
+    <style>
+      .slides {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 1rem;
+        list-style: none;
+        padding: 0;
+      }
+      .slide {
+        flex: 0 0 100%;
+        scroll-snap-align: center;
+      }
+      .indicators {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ccc;
+        border: none;
+        cursor: pointer;
+      }
+      .dot.active { background: #000; }
+    </style>
+  vanilla: |
+    /* HTML */
+    <div class="carousel">
+      <ul class="carousel__slides">
+        <li class="carousel__slide" data-index="0">
+          <img src="img1.jpg" alt="Slide 1" loading="lazy" />
+        </li>
+        <li class="carousel__slide" data-index="1">
+          <img src="img2.jpg" alt="Slide 2" loading="lazy" />
+        </li>
+      </ul>
+      <div class="carousel__indicators"></div>
+    </div>
+
+    /* CSS */
+    .carousel { position: relative; }
+    .carousel__slides {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      scrollbar-width: none;
+    }
+    .carousel__slides::-webkit-scrollbar { display: none; }
+    .carousel__slide {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+    }
+    .carousel__indicators {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .carousel__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      border: none;
+      cursor: pointer;
+    }
+    .carousel__dot.active { background: #000; }
+
+    /* JavaScript */
+    function initCarousel(container) {
+      const slides = container.querySelector('.carousel__slides');
+      const indicatorsContainer = container.querySelector('.carousel__indicators');
+      const slideEls = slides.querySelectorAll('.carousel__slide');
+
+      slideEls.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'carousel__dot' + (i === 0 ? ' active' : '');
+        dot.onclick = () => slideEls[i].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        indicatorsContainer.appendChild(dot);
+      });
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const index = entry.target.dataset.index;
+            indicatorsContainer.querySelectorAll('.carousel__dot').forEach((dot, i) => {
+              dot.classList.toggle('active', i === Number(index));
+            });
+          }
+        });
+      }, { root: slides, threshold: 0.5 });
+
+      slideEls.forEach(slide => observer.observe(slide));
+    }

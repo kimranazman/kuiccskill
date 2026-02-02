@@ -1,0 +1,181 @@
+name: Scroll-Triggered Parallax
+category: micro-interactions
+tags:
+  - scroll
+  - parallax
+  - animation
+  - depth
+  - performance
+source:
+  url: https://mindmarket.com
+  extracted: 2026-02-02
+principles:
+  - Use transform-based animations for GPU acceleration
+  - Different scroll speeds create depth illusion
+  - CSS custom properties enable runtime customization
+  - will-change hints improve rendering performance
+  - Disable on mobile for battery and performance
+accessibility:
+  level: AA
+  notes: Respect prefers-reduced-motion media query
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: Elements move at different speeds relative to scroll position, creating a sense of depth and visual interest as users scroll through the page.
+  usage: Apply to decorative elements, background imagery, or floating elements to create visual depth during scroll.
+  parameters:
+    - name: speed
+      type: number
+      default: "0.1"
+      description: Scroll speed multiplier (0.05 = slow, 0.2 = fast)
+    - name: direction
+      type: string
+      default: vertical
+      description: Parallax direction (vertical or horizontal)
+  best_practices:
+    - Keep speed values between 0.02 and 0.2 for subtle effect
+    - Disable parallax below 768px for mobile performance
+    - Use IntersectionObserver to only animate visible elements
+    - Test on low-power devices
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import { useEffect, useRef } from 'react';
+
+    export function Parallax({ children, speed = 0.1 }) {
+      const ref = useRef<HTMLDivElement>(null);
+
+      useEffect(() => {
+        const prefersReducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReducedMotion) return;
+
+        const handleScroll = () => {
+          if (!ref.current) return;
+          const scrollY = window.scrollY;
+          const offset = scrollY * speed;
+          ref.current.style.transform = `translateY(${offset}px)`;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, [speed]);
+
+      return (
+        <div ref={ref} style={{ willChange: 'transform' }}>
+          {children}
+        </div>
+      );
+    }
+  vue: |
+    <template>
+      <div ref="parallaxRef" :style="{ willChange: 'transform' }">
+        <slot />
+      </div>
+    </template>
+
+    <script setup lang="ts">
+    import { ref, onMounted, onUnmounted } from 'vue';
+
+    const props = withDefaults(defineProps<{ speed?: number }>(), {
+      speed: 0.1
+    });
+
+    const parallaxRef = ref<HTMLDivElement>();
+
+    const handleScroll = () => {
+      if (!parallaxRef.value) return;
+      const offset = window.scrollY * props.speed;
+      parallaxRef.value.style.transform = `translateY(${offset}px)`;
+    };
+
+    onMounted(() => {
+      const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+      if (prefersReducedMotion) return;
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
+    </script>
+  svelte: |
+    <script lang="ts">
+      import { onMount } from 'svelte';
+
+      export let speed = 0.1;
+
+      let element: HTMLDivElement;
+      let offset = 0;
+
+      onMount(() => {
+        const prefersReducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReducedMotion) return;
+
+        const handleScroll = () => {
+          offset = window.scrollY * speed;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+      });
+    </script>
+
+    <div
+      bind:this={element}
+      style="transform: translateY({offset}px); will-change: transform;"
+    >
+      <slot />
+    </div>
+  vanilla: |
+    /* HTML */
+    <div class="parallax" data-parallax-speed="0.1">
+      <img src="background.jpg" alt="" />
+    </div>
+
+    /* CSS */
+    .parallax {
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .parallax {
+        transform: none !important;
+      }
+    }
+
+    /* JavaScript */
+    function initParallax() {
+      const elements = document.querySelectorAll('[data-parallax-speed]');
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+
+      const handleScroll = () => {
+        elements.forEach(el => {
+          const speed = parseFloat(el.dataset.parallaxSpeed) || 0.1;
+          const offset = window.scrollY * speed;
+          el.style.transform = `translateY(${offset}px)`;
+        });
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    document.addEventListener('DOMContentLoaded', initParallax);

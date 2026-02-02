@@ -1,0 +1,187 @@
+name: Link Hover Slide Effect
+category: micro-interactions
+tags:
+  - hover
+  - link
+  - animation
+  - slide
+  - reveal
+source:
+  url: https://kprverse.com
+  extracted: 2026-02-02
+principles:
+  - Use overflow hidden on parent to mask the sliding background
+  - Background starts off-screen with transform translate(-101%)
+  - GPU-accelerated transforms for smooth 60fps animation
+  - Keep text color separate from background for independent control
+  - Use position absolute for background layer to avoid layout shifts
+accessibility:
+  level: AA
+  notes: Hover states should not be the only indicator of interactivity
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A sophisticated link hover effect where a background color slides in from the left, creating a reveal animation without changing text color directly.
+  usage: Apply to text links or navigation items where you want a subtle but engaging hover interaction.
+  parameters:
+    - name: bgColor
+      type: string
+      default: currentColor
+      description: Background color that slides in on hover
+    - name: duration
+      type: string
+      default: 300ms
+      description: Animation duration
+  best_practices:
+    - Ensure sufficient color contrast between text and sliding background
+    - Keep animation duration under 400ms for responsiveness
+    - Consider reduced motion preferences
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import styles from './LinkHover.module.css';
+
+    export function LinkHover({ href, children }) {
+      return (
+        <a href={href} className={styles.linkHover}>
+          <span className={styles.bg}></span>
+          <span className={styles.content}>{children}</span>
+        </a>
+      );
+    }
+
+    // LinkHover.module.css
+    // .linkHover {
+    //   display: inline-block;
+    //   overflow: hidden;
+    //   position: relative;
+    //   vertical-align: top;
+    // }
+    // .bg {
+    //   position: absolute;
+    //   top: 0;
+    //   left: 0;
+    //   width: 100%;
+    //   height: 100%;
+    //   background: var(--accent-color, currentColor);
+    //   transform: translateX(-101%);
+    //   transition: transform 0.3s ease;
+    // }
+    // .linkHover:hover .bg {
+    //   transform: translateX(0);
+    // }
+    // .content {
+    //   position: relative;
+    //   display: inline-block;
+    // }
+  vue: |
+    <template>
+      <a :href="href" class="link-hover">
+        <span class="bg"></span>
+        <span class="content"><slot /></span>
+      </a>
+    </template>
+
+    <script setup lang="ts">
+    defineProps<{ href: string }>();
+    </script>
+
+    <style scoped>
+    .link-hover {
+      display: inline-block;
+      overflow: hidden;
+      position: relative;
+      vertical-align: top;
+    }
+    .bg {
+      position: absolute;
+      inset: 0;
+      background: var(--accent-color, currentColor);
+      transform: translateX(-101%);
+      transition: transform 0.3s ease;
+    }
+    .link-hover:hover .bg {
+      transform: translateX(0);
+    }
+    .content {
+      position: relative;
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      export let href: string;
+    </script>
+
+    <a {href} class="link-hover">
+      <span class="bg"></span>
+      <span class="content"><slot /></span>
+    </a>
+
+    <style>
+      .link-hover {
+        display: inline-block;
+        overflow: hidden;
+        position: relative;
+      }
+      .bg {
+        position: absolute;
+        inset: 0;
+        background: var(--accent-color, currentColor);
+        transform: translateX(-101%);
+        transition: transform 0.3s ease;
+      }
+      .link-hover:hover .bg {
+        transform: translateX(0);
+      }
+      .content {
+        position: relative;
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <a href="#" class="link-hover">
+      <span class="link-hover__bg"></span>
+      <span class="link-hover__content">Hover me</span>
+    </a>
+
+    /* CSS */
+    .link-hover {
+      display: inline-block;
+      overflow: hidden;
+      position: relative;
+      vertical-align: top;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .link-hover__bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--accent-color, #000);
+      transform: translateX(-101%);
+      transition: transform 0.3s ease;
+    }
+
+    .link-hover:hover .link-hover__bg {
+      transform: translateX(0);
+    }
+
+    .link-hover__content {
+      position: relative;
+      display: inline-block;
+      padding: 0.25em 0.5em;
+    }
+
+    .link-hover:hover .link-hover__content {
+      color: #fff;
+    }
