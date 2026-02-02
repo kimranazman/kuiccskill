@@ -21,6 +21,36 @@ principles:
   - Maintain consistent height to prevent layout shift
   - Use z-index layering system (e.g., z-50 for nav)
   - Backdrop blur effect for glassmorphism style
+
+documentation:
+  description: "A navigation bar that sticks to the top of the viewport on scroll, with dynamic styling that changes based on scroll position. Features glassmorphism effect with backdrop blur and shadow that appears after scrolling."
+  usage: "Place at the top of your layout. The navbar automatically adds a shadow and backdrop blur when the user scrolls down. Include your logo and navigation links as children."
+  parameters:
+    - name: items
+      type: "NavItem[]"
+      description: Array of navigation items with label and href
+      required: true
+    - name: logo
+      type: "React.ReactNode"
+      description: Logo component or element to display
+      required: false
+    - name: scrollThreshold
+      type: number
+      description: Scroll distance before style changes (pixels)
+      required: false
+      default: "10"
+  best_practices:
+    - "Always include a skip link for keyboard users"
+    - "Use aria-label on nav element"
+    - "Keep navbar height consistent to prevent layout shift"
+    - "Use z-index from a consistent scale (e.g., z-50 for navigation)"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     import { useState, useEffect } from 'react';
@@ -56,6 +86,104 @@ code_examples:
         </>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    import { ref, onMounted, onUnmounted } from 'vue';
+
+    interface NavItem {
+      label: string;
+      href: string;
+    }
+
+    interface Props {
+      items: NavItem[];
+      scrollThreshold?: number;
+    }
+
+    const props = withDefaults(defineProps<Props>(), {
+      scrollThreshold: 10,
+    });
+
+    const scrolled = ref(false);
+
+    const handleScroll = () => {
+      scrolled.value = window.scrollY > props.scrollThreshold;
+    };
+
+    onMounted(() => window.addEventListener('scroll', handleScroll));
+    onUnmounted(() => window.removeEventListener('scroll', handleScroll));
+    </script>
+    <template>
+      <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-white">
+        Skip to content
+      </a>
+      <nav
+        :class="[
+          'sticky top-0 z-50 transition-all duration-300',
+          scrolled ? 'bg-white/80 backdrop-blur-md shadow-md' : 'bg-transparent'
+        ]"
+        aria-label="Main navigation"
+      >
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <slot name="logo" />
+          <div class="flex items-center gap-6">
+            <a
+              v-for="item in items"
+              :key="item.href"
+              :href="item.href"
+              class="text-gray-700 hover:text-gray-900"
+            >
+              {{ item.label }}
+            </a>
+          </div>
+        </div>
+      </nav>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      import { onMount, onDestroy } from 'svelte';
+
+      interface NavItem {
+        label: string;
+        href: string;
+      }
+
+      export let items: NavItem[] = [];
+      export let scrollThreshold: number = 10;
+
+      let scrolled = false;
+
+      const handleScroll = () => {
+        scrolled = window.scrollY > scrollThreshold;
+      };
+
+      onMount(() => window.addEventListener('scroll', handleScroll));
+      onDestroy(() => window.removeEventListener('scroll', handleScroll));
+    </script>
+
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-white">
+      Skip to content
+    </a>
+    <nav
+      class="sticky top-0 z-50 transition-all duration-300"
+      class:bg-white/80={scrolled}
+      class:backdrop-blur-md={scrolled}
+      class:shadow-md={scrolled}
+      class:bg-transparent={!scrolled}
+      aria-label="Main navigation"
+    >
+      <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <slot name="logo" />
+        <div class="flex items-center gap-6">
+          {#each items as item}
+            <a href={item.href} class="text-gray-700 hover:text-gray-900">{item.label}</a>
+          {/each}
+        </div>
+      </div>
+    </nav>
+
   vanilla: |-
     .navbar {
       position: sticky;

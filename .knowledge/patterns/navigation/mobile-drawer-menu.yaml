@@ -21,6 +21,42 @@ principles:
   - Focus trap to keep keyboard navigation within drawer
   - Escape key closes drawer for keyboard users
   - Transform-based animation for GPU acceleration
+
+documentation:
+  description: "A mobile-first off-canvas navigation drawer that slides in from the left. Features a semi-transparent backdrop, focus trapping for accessibility, and smooth GPU-accelerated animations."
+  usage: "Trigger with a hamburger menu button. Pass isOpen state and onClose handler. Content is rendered as children inside the drawer panel."
+  parameters:
+    - name: isOpen
+      type: boolean
+      description: Controls drawer visibility
+      required: true
+    - name: onClose
+      type: "() => void"
+      description: Callback when drawer should close (backdrop click, escape key, close button)
+      required: true
+    - name: width
+      type: string
+      description: Drawer width
+      required: false
+      default: "'18rem'"
+    - name: side
+      type: "'left' | 'right'"
+      description: Side the drawer opens from
+      required: false
+      default: "'left'"
+  best_practices:
+    - "Implement focus trap when drawer is open"
+    - "Support Escape key to close"
+    - "Prevent body scroll when open"
+    - "Return focus to trigger button on close"
+    - "Use transform for animations (GPU accelerated)"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     import { useEffect, useRef } from 'react';
@@ -82,6 +118,118 @@ code_examples:
         </>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    import { watch, onUnmounted } from 'vue';
+
+    interface Props {
+      isOpen: boolean;
+    }
+
+    const props = defineProps<Props>();
+    const emit = defineEmits<{ close: [] }>();
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') emit('close');
+    };
+
+    watch(() => props.isOpen, (open) => {
+      if (open) {
+        document.addEventListener('keydown', handleEscape);
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = '';
+      }
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    });
+    </script>
+    <template>
+      <div
+        :class="[
+          'fixed inset-0 bg-black/50 z-40 transition-opacity',
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        ]"
+        @click="emit('close')"
+        aria-hidden="true"
+      />
+      <nav
+        :class="[
+          'fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300',
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        ]"
+        aria-label="Mobile menu"
+      >
+        <button
+          @click="emit('close')"
+          class="absolute top-4 right-4 p-2"
+          aria-label="Close menu"
+        >
+          <slot name="close-icon">X</slot>
+        </button>
+        <div class="pt-16 px-4">
+          <slot />
+        </div>
+      </nav>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      import { createEventDispatcher, onDestroy } from 'svelte';
+
+      export let isOpen: boolean = false;
+
+      const dispatch = createEventDispatcher();
+
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') dispatch('close');
+      };
+
+      $: if (isOpen) {
+        document.addEventListener('keydown', handleEscape);
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = '';
+      }
+
+      onDestroy(() => {
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = '';
+      });
+    </script>
+
+    <div
+      class="fixed inset-0 bg-black/50 z-40 transition-opacity"
+      class:opacity-100={isOpen}
+      class:opacity-0={!isOpen}
+      class:pointer-events-none={!isOpen}
+      on:click={() => dispatch('close')}
+      aria-hidden="true"
+    />
+    <nav
+      class="fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300"
+      class:translate-x-0={isOpen}
+      class:-translate-x-full={!isOpen}
+      aria-label="Mobile menu"
+    >
+      <button
+        on:click={() => dispatch('close')}
+        class="absolute top-4 right-4 p-2"
+        aria-label="Close menu"
+      >
+        <slot name="close-icon">X</slot>
+      </button>
+      <div class="pt-16 px-4">
+        <slot />
+      </div>
+    </nav>
+
   vanilla: |-
     .drawer-backdrop {
       position: fixed;
