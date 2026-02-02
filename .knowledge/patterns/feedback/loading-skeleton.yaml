@@ -21,6 +21,39 @@ principles:
   - Preserve layout dimensions for seamless transition
   - Use neutral gray tones that work in light/dark modes
   - Pulse or wave animation for visual feedback
+
+documentation:
+  description: "Loading placeholder components that match the shape of the content being loaded. Features a subtle shimmer animation that indicates loading without being distracting. Prevents layout shift by preserving exact content dimensions."
+  usage: "Create skeleton components that match your content structure. Use Skeleton for basic shapes, compose CardSkeleton or TextSkeleton for common patterns. Show while data is loading, replace with actual content when ready."
+  parameters:
+    - name: className
+      type: string
+      description: Additional CSS classes for sizing (h-48, w-full, etc.)
+      required: false
+      default: "''"
+    - name: lines
+      type: number
+      description: Number of text lines for TextSkeleton
+      required: false
+      default: "3"
+    - name: animate
+      type: boolean
+      description: Whether to show shimmer animation
+      required: false
+      default: "true"
+  best_practices:
+    - "Match skeleton dimensions exactly to content dimensions"
+    - "Use aria-busy='true' on the loading container"
+    - "Hide skeletons from screen readers with aria-hidden"
+    - "Keep animation subtle to avoid distraction"
+    - "Consider prefers-reduced-motion for accessibility"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: |-
     const Skeleton = ({ className = '' }: { className?: string }) => (
@@ -49,6 +82,87 @@ code_examples:
         ))}
       </div>
     );
+
+  vue: |
+    <script setup lang="ts">
+    interface Props {
+      className?: string;
+    }
+
+    withDefaults(defineProps<Props>(), {
+      className: '',
+    });
+    </script>
+    <template>
+      <div
+        :class="['animate-pulse bg-gray-200 rounded', className]"
+        aria-hidden="true"
+      />
+    </template>
+
+    <!-- CardSkeleton.vue -->
+    <script setup lang="ts">
+    import Skeleton from './Skeleton.vue';
+    </script>
+    <template>
+      <div aria-busy="true" aria-label="Loading content" class="space-y-4">
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+      </div>
+    </template>
+
+    <!-- TextSkeleton.vue -->
+    <script setup lang="ts">
+    import Skeleton from './Skeleton.vue';
+    interface Props { lines?: number; }
+    const props = withDefaults(defineProps<Props>(), { lines: 3 });
+    </script>
+    <template>
+      <div aria-busy="true" aria-label="Loading text" class="space-y-2">
+        <Skeleton
+          v-for="i in lines"
+          :key="i"
+          :className="`h-4 ${i === lines ? 'w-4/5' : 'w-full'}`"
+        />
+      </div>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      export let className: string = '';
+    </script>
+
+    <div
+      class="animate-pulse bg-gray-200 rounded {className}"
+      aria-hidden="true"
+    />
+
+    <!-- CardSkeleton.svelte -->
+    <script lang="ts">
+      import Skeleton from './Skeleton.svelte';
+    </script>
+
+    <div aria-busy="true" aria-label="Loading content" class="space-y-4">
+      <Skeleton className="h-48 w-full" />
+      <Skeleton className="h-6 w-3/4" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
+    </div>
+
+    <!-- TextSkeleton.svelte -->
+    <script lang="ts">
+      import Skeleton from './Skeleton.svelte';
+      export let lines: number = 3;
+    </script>
+
+    <div aria-busy="true" aria-label="Loading text" class="space-y-2">
+      {#each Array(lines) as _, i}
+        <Skeleton className="h-4 {i === lines - 1 ? 'w-4/5' : 'w-full'}" />
+      {/each}
+    </div>
+
   vanilla: |-
     .skeleton {
       background: linear-gradient(

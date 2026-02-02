@@ -21,6 +21,42 @@ principles:
   - Variants for success, error, warning, and info states
   - Manual dismiss option for user control
   - Animation for smooth appearance and exit
+
+documentation:
+  description: "A non-blocking notification that appears in a corner of the screen to provide feedback about an action. Auto-dismisses after a configurable duration. Supports success, error, warning, and info variants with appropriate styling and icons."
+  usage: "Trigger via a toast manager or state update when user actions complete. Use success for completed actions, error for failures, warning for caution, info for neutral updates."
+  parameters:
+    - name: message
+      type: string
+      description: Message text to display in the toast
+      required: true
+    - name: type
+      type: "'success' | 'error' | 'warning' | 'info'"
+      description: Visual style variant
+      required: false
+      default: "'info'"
+    - name: duration
+      type: number
+      description: Auto-dismiss time in milliseconds (0 to disable)
+      required: false
+      default: "3000"
+    - name: onDismiss
+      type: "() => void"
+      description: Callback when toast is dismissed (manually or auto)
+      required: true
+  best_practices:
+    - "Use appropriate colors for each type (green=success, red=error, yellow=warning, blue=info)"
+    - "Ensure toasts don't block important content or actions"
+    - "Provide dismiss button for accessibility and user control"
+    - "Use role='alert' only for errors, role='status' for others"
+    - "Limit concurrent toasts to avoid overwhelming users"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -66,6 +102,102 @@ code_examples:
         </div>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    import { onMounted } from 'vue';
+
+    type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+    interface Props {
+      message: string;
+      type?: ToastType;
+      duration?: number;
+    }
+
+    const props = withDefaults(defineProps<Props>(), {
+      type: 'info',
+      duration: 3000,
+    });
+
+    const emit = defineEmits<{ dismiss: [] }>();
+
+    const styles: Record<ToastType, string> = {
+      success: 'bg-green-500 text-white',
+      error: 'bg-red-500 text-white',
+      warning: 'bg-yellow-500 text-black',
+      info: 'bg-blue-500 text-white',
+    };
+
+    onMounted(() => {
+      if (props.duration > 0) {
+        setTimeout(() => emit('dismiss'), props.duration);
+      }
+    });
+    </script>
+    <template>
+      <div
+        :role="type === 'error' ? 'alert' : 'status'"
+        :aria-live="type === 'error' ? 'assertive' : 'polite'"
+        :class="[
+          'fixed bottom-4 right-4 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slide-up',
+          styles[type]
+        ]"
+      >
+        <slot name="icon" />
+        <span>{{ message }}</span>
+        <button
+          @click="emit('dismiss')"
+          class="ml-2 hover:opacity-70 transition-opacity"
+          aria-label="Dismiss"
+        >
+          <slot name="close-icon">X</slot>
+        </button>
+      </div>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      import { onMount, createEventDispatcher } from 'svelte';
+
+      type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+      export let message: string;
+      export let type: ToastType = 'info';
+      export let duration: number = 3000;
+
+      const dispatch = createEventDispatcher();
+
+      const styles: Record<ToastType, string> = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-500 text-white',
+        warning: 'bg-yellow-500 text-black',
+        info: 'bg-blue-500 text-white',
+      };
+
+      onMount(() => {
+        if (duration > 0) {
+          setTimeout(() => dispatch('dismiss'), duration);
+        }
+      });
+    </script>
+
+    <div
+      role={type === 'error' ? 'alert' : 'status'}
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+      class="fixed bottom-4 right-4 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slide-up {styles[type]}"
+    >
+      <slot name="icon" />
+      <span>{message}</span>
+      <button
+        on:click={() => dispatch('dismiss')}
+        class="ml-2 hover:opacity-70 transition-opacity"
+        aria-label="Dismiss"
+      >
+        <slot name="close-icon">X</slot>
+      </button>
+    </div>
+
   vanilla: |-
     .toast {
       position: fixed;
