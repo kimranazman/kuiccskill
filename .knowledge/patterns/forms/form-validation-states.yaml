@@ -21,6 +21,52 @@ principles:
   - Color is not the only indicator (use icons and text)
   - Inline validation provides immediate feedback
   - Group related error messages for screen readers with live regions
+
+documentation:
+  description: "Input component with visual validation states (idle, error, success). Shows error and success messages below the input with appropriate icons and colors. Uses ARIA attributes for accessibility."
+  usage: "Wrap your input with validation state management. Set state based on validation results. Error and success messages display automatically when state changes."
+  parameters:
+    - name: id
+      type: string
+      description: Unique identifier for input and error association
+      required: true
+    - name: label
+      type: string
+      description: Label text to display
+      required: true
+    - name: value
+      type: string
+      description: Current input value
+      required: true
+    - name: onChange
+      type: "(value: string) => void"
+      description: Callback when value changes
+      required: true
+    - name: state
+      type: "'idle' | 'error' | 'success'"
+      description: Current validation state
+      required: true
+    - name: errorMessage
+      type: string
+      description: Error message to display when state is error
+      required: false
+    - name: successMessage
+      type: string
+      description: Success message to display when state is success
+      required: false
+  best_practices:
+    - "Use aria-invalid for error state accessibility"
+    - "Associate error message with aria-describedby"
+    - "Use icons in addition to color for state indication"
+    - "Keep error messages concise and actionable"
+    - "Validate on blur for better UX, not on every keystroke"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     type ValidationState = 'idle' | 'error' | 'success';
@@ -86,6 +132,101 @@ code_examples:
         </div>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    type ValidationState = 'idle' | 'error' | 'success';
+
+    interface Props {
+      id: string;
+      label: string;
+      state: ValidationState;
+      errorMessage?: string;
+      successMessage?: string;
+    }
+
+    const props = withDefaults(defineProps<Props>(), {
+      state: 'idle',
+    });
+
+    const modelValue = defineModel<string>({ required: true });
+
+    const inputClasses = computed(() => {
+      const base = 'w-full px-4 py-2 border-2 rounded-lg outline-none transition-colors';
+      if (props.state === 'error') return `${base} border-red-500 bg-red-50`;
+      if (props.state === 'success') return `${base} border-green-500 bg-green-50`;
+      return `${base} border-gray-200 focus:border-blue-500`;
+    });
+    </script>
+    <template>
+      <div>
+        <label :for="id" class="block text-sm font-medium mb-1">{{ label }}</label>
+        <div class="relative">
+          <input
+            :id="id"
+            v-model="modelValue"
+            :aria-invalid="state === 'error'"
+            :aria-describedby="state === 'error' ? `${id}-error` : undefined"
+            :class="inputClasses"
+          />
+          <span v-if="state !== 'idle'" class="absolute right-3 top-1/2 -translate-y-1/2">
+            <slot :name="state === 'error' ? 'error-icon' : 'success-icon'" />
+          </span>
+        </div>
+        <p v-if="state === 'error' && errorMessage" :id="`${id}-error`" class="mt-1 text-sm text-red-600 flex items-center gap-1" role="alert">
+          {{ errorMessage }}
+        </p>
+        <p v-if="state === 'success' && successMessage" class="mt-1 text-sm text-green-600">
+          {{ successMessage }}
+        </p>
+      </div>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      type ValidationState = 'idle' | 'error' | 'success';
+
+      export let id: string;
+      export let label: string;
+      export let value: string = '';
+      export let state: ValidationState = 'idle';
+      export let errorMessage: string = '';
+      export let successMessage: string = '';
+
+      $: inputClasses = [
+        'w-full px-4 py-2 border-2 rounded-lg outline-none transition-colors',
+        state === 'error' ? 'border-red-500 bg-red-50' :
+        state === 'success' ? 'border-green-500 bg-green-50' :
+        'border-gray-200 focus:border-blue-500'
+      ].join(' ');
+    </script>
+
+    <div>
+      <label for={id} class="block text-sm font-medium mb-1">{label}</label>
+      <div class="relative">
+        <input
+          {id}
+          bind:value
+          aria-invalid={state === 'error'}
+          aria-describedby={state === 'error' ? `${id}-error` : undefined}
+          class={inputClasses}
+        />
+        {#if state !== 'idle'}
+          <span class="absolute right-3 top-1/2 -translate-y-1/2">
+            <slot name={state === 'error' ? 'error-icon' : 'success-icon'} />
+          </span>
+        {/if}
+      </div>
+      {#if state === 'error' && errorMessage}
+        <p id="{id}-error" class="mt-1 text-sm text-red-600 flex items-center gap-1" role="alert">
+          {errorMessage}
+        </p>
+      {/if}
+      {#if state === 'success' && successMessage}
+        <p class="mt-1 text-sm text-green-600">{successMessage}</p>
+      {/if}
+    </div>
+
   vanilla: |-
     .input-wrapper { margin-bottom: 1rem; }
 

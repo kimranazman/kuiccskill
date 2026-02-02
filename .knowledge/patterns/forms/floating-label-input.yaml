@@ -21,6 +21,44 @@ principles:
   - Clear visual hierarchy with color change on focus
   - Always visible label state for accessibility
   - Input border color indicates focus state clearly
+
+documentation:
+  description: "A Material Design-inspired input field where the label animates from placeholder position to above the input on focus or when content is present. Provides clear visual feedback while saving space."
+  usage: "Use for forms where space efficiency matters. The floating animation gives users clear feedback about which field they're editing. Always use with proper htmlFor/id association."
+  parameters:
+    - name: id
+      type: string
+      description: Unique identifier for input and label association
+      required: true
+    - name: label
+      type: string
+      description: Label text to display
+      required: true
+    - name: value
+      type: string
+      description: Current input value
+      required: true
+    - name: onChange
+      type: "(value: string) => void"
+      description: Callback when value changes
+      required: true
+    - name: type
+      type: string
+      description: Input type (text, email, password, etc.)
+      required: false
+      default: "'text'"
+  best_practices:
+    - "Always associate label with input using htmlFor/for attribute"
+    - "Ensure sufficient color contrast for accessibility (4.5:1)"
+    - "Use placeholder=' ' (space) for CSS :placeholder-shown selector"
+    - "Keep label text concise to avoid overflow when floating"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     interface FloatingInputProps {
@@ -61,6 +99,77 @@ code_examples:
         </div>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    import { computed } from 'vue';
+
+    interface Props {
+      id: string;
+      label: string;
+      type?: string;
+    }
+
+    const props = withDefaults(defineProps<Props>(), { type: 'text' });
+    const modelValue = defineModel<string>({ required: true });
+    const hasValue = computed(() => modelValue.value.length > 0);
+    </script>
+    <template>
+      <div class="floating-input-wrapper relative">
+        <input
+          :id="id"
+          :type="type"
+          v-model="modelValue"
+          class="peer w-full px-4 pt-5 pb-2 border-2 border-gray-200 rounded-lg outline-none focus:border-blue-500 transition-colors"
+          placeholder=" "
+        />
+        <label
+          :for="id"
+          :class="[
+            'absolute left-4 transition-all duration-200 pointer-events-none',
+            hasValue
+              ? 'top-1 text-xs text-blue-500'
+              : 'top-1/2 -translate-y-1/2 text-gray-400',
+            'peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-500'
+          ]"
+        >
+          {{ label }}
+        </label>
+      </div>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      export let id: string;
+      export let label: string;
+      export let type: string = 'text';
+      export let value: string = '';
+
+      $: hasValue = value.length > 0;
+    </script>
+
+    <div class="floating-input-wrapper relative">
+      <input
+        {id}
+        {type}
+        bind:value
+        class="peer w-full px-4 pt-5 pb-2 border-2 border-gray-200 rounded-lg outline-none focus:border-blue-500 transition-colors"
+        placeholder=" "
+      />
+      <label
+        for={id}
+        class="absolute left-4 transition-all duration-200 pointer-events-none peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-500"
+        class:top-1={hasValue}
+        class:text-xs={hasValue}
+        class:text-blue-500={hasValue}
+        class:top-1/2={!hasValue}
+        class:-translate-y-1/2={!hasValue}
+        class:text-gray-400={!hasValue}
+      >
+        {label}
+      </label>
+    </div>
+
   vanilla: |-
     .floating-input-wrapper {
       position: relative;
