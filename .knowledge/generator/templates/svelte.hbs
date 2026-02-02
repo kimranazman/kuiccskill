@@ -1,28 +1,53 @@
-<!--
-  {{name}}
-
-  Design Principles:
-{{#each principles}}
-  - {{this}}
-{{/each}}
-
-  Category: {{category}}
--->
-
 {{#if code}}
 {{{code}}}
 {{else}}
 <script lang="ts">
-  // Props based on pattern requirements
+  /**
+   * {{name}}
+   *
+   * Design Principles:
+{{#each principles}}
+   * - {{this}}
+{{/each}}
+   *
+   * Category: {{category}}
+{{#if accessibility}}
+   * Accessibility: {{accessibility.notes}}
+{{/if}}
+{{#if documentation}}
+   *
+   * {{documentation.description}}
+{{/if}}
+   */
+
+{{#if documentation.parameters}}
+  // Props with TypeScript types
+{{#each documentation.parameters}}
+  /** {{description}} */
+  export let {{name}}: {{type}}{{#if default}} = {{default}}{{/if}};
+{{/each}}
+{{else}}
+  // Add props based on pattern requirements
+{{/if}}
 </script>
 
 <div class="{{slugName}}">
-  <!-- Implement based on principles above -->
+  <!--
+    Implement based on principles:
+{{#each principles}}
+    - {{this}}
+{{/each}}
+  -->
 </div>
 
 <style>
   .{{slugName}} {
-    /* Apply principles */
+    /*
+     * Apply design principles:
+{{#each principles}}
+     * - {{this}}
+{{/each}}
+     */
   }
 </style>
 {{/if}}
