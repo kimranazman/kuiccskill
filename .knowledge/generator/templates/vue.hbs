@@ -1,41 +1,68 @@
-<!--
-  {{name}}
-
-  Design Principles:
-{{#each principles}}
-  - {{this}}
-{{/each}}
-
-  Category: {{category}}
-{{#if accessibility}}
-  Accessibility: {{accessibility.notes}}
-{{/if}}
--->
-
 {{#if code}}
 {{{code}}}
 {{else}}
 <script setup lang="ts">
-// Props based on pattern requirements
+/**
+ * {{name}}
+ *
+ * Design Principles:
+{{#each principles}}
+ * - {{this}}
+{{/each}}
+ *
+ * Category: {{category}}
+{{#if accessibility}}
+ * Accessibility: {{accessibility.notes}}
+{{/if}}
+{{#if documentation}}
+ *
+ * {{documentation.description}}
+{{/if}}
+ */
+
+{{#if documentation.parameters}}
 interface Props {
+{{#each documentation.parameters}}
+  /** {{description}} */
+  {{name}}{{#unless required}}?{{/unless}}: {{type}};
+{{/each}}
+}
+
+const props = withDefaults(defineProps<Props>(), {
+{{#each documentation.parameters}}
+{{#if default}}
+  {{name}}: {{default}},
+{{/if}}
+{{/each}}
+});
+{{else}}
+interface Props {
+  // Add props based on pattern requirements
 }
 
 defineProps<Props>();
+{{/if}}
 </script>
 
 <template>
   <div class="{{slugName}}">
-    <!-- Implement based on principles above -->
+    <!--
+      Implement based on principles:
+{{#each principles}}
+      - {{this}}
+{{/each}}
+    -->
   </div>
 </template>
 
 <style scoped>
 .{{slugName}} {
-  /* Apply principles:
+  /*
+   * Apply design principles:
 {{#each principles}}
-     - {{this}}
+   * - {{this}}
 {{/each}}
-  */
+   */
 }
 </style>
 {{/if}}
