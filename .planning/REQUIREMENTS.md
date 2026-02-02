@@ -9,12 +9,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Pattern Storage
 
-- [ ] **STOR-01**: System stores patterns in structured YAML files with validation
-- [ ] **STOR-02**: Patterns organized in multi-level categories (Layout, Forms, Navigation, Micro-interactions, Data Display, Feedback, Authentication)
-- [ ] **STOR-03**: Tag-based search returns patterns matching criteria
-- [ ] **STOR-04**: Filter patterns by framework, category, and tags
-- [ ] **STOR-05**: YAML schema validation prevents invalid patterns (Zod-based)
-- [ ] **STOR-06**: Patterns stored in `.knowledge/patterns/` directory structure
+- [x] **STOR-01**: System stores patterns in structured YAML files with validation
+- [x] **STOR-02**: Patterns organized in multi-level categories (Layout, Forms, Navigation, Micro-interactions, Data Display, Feedback, Authentication)
+- [x] **STOR-03**: Tag-based search returns patterns matching criteria
+- [x] **STOR-04**: Filter patterns by framework, category, and tags
+- [x] **STOR-05**: YAML schema validation prevents invalid patterns (Zod-based)
+- [x] **STOR-06**: Patterns stored in `.knowledge/patterns/` directory structure
 
 ### Code Generation
 
@@ -109,12 +109,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STOR-01 | Phase 1 | Pending |
-| STOR-02 | Phase 1 | Pending |
-| STOR-03 | Phase 1 | Pending |
-| STOR-04 | Phase 1 | Pending |
-| STOR-05 | Phase 1 | Pending |
-| STOR-06 | Phase 1 | Pending |
+| STOR-01 | Phase 1 | Complete |
+| STOR-02 | Phase 1 | Complete |
+| STOR-03 | Phase 1 | Complete |
+| STOR-04 | Phase 1 | Complete |
+| STOR-05 | Phase 1 | Complete |
+| STOR-06 | Phase 1 | Complete |
 | GEN-01 | Phase 2 | Pending |
 | GEN-02 | Phase 2 | Pending |
 | GEN-03 | Phase 2 | Pending |
@@ -156,4 +156,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after roadmap creation*
+*Last updated: 2026-02-02 after Phase 1 completion*
