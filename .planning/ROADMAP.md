@@ -47,10 +47,14 @@ Plans:
   3. Generated code copies to clipboard with confirmation feedback
   4. Template system generates framework-agnostic patterns using Handlebars
   5. Code preview displays before copying to allow user review
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Framework detection (detect React/Vue/Svelte/vanilla from package.json)
+- [ ] 02-02-PLAN.md — Handlebars templates (React, Vue, Svelte, vanilla code generation templates)
+- [ ] 02-03-PLAN.md — Code generator core (template compilation, pattern context building)
+- [ ] 02-04-PLAN.md — Output system (syntax highlighting, clipboard copy with feedback)
+- [ ] 02-05-PLAN.md — Skill integration (KUI Design skill with :generate sub-command)
 
 ### Phase 3: Pattern Extraction
 **Goal**: Automatically extract design patterns from website HTML/CSS via AI analysis
@@ -112,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Pattern Storage Foundation | 3/3 | Complete | 2026-02-02 |
-| 2. Code Generation Engine | 0/0 | Not started | - |
+| 2. Code Generation Engine | 0/5 | Planned | - |
 | 3. Pattern Extraction | 0/0 | Not started | - |
 | 4. Multi-Framework & Documentation | 0/0 | Not started | - |
 | 5. Integration & Performance | 0/0 | Not started | - |
