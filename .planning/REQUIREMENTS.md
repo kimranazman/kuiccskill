@@ -42,14 +42,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Integration & Performance
 
-- [ ] **INT-01**: Auto-enhancement integrates with frontend-design skill workflow
+- [x] **INT-01**: Auto-enhancement integrates with frontend-design skill workflow
 - [x] **INT-02**: Sub-command `:analyze` triggers pattern extraction from URL
 - [x] **INT-03**: Sub-command `:generate` triggers code generation from stored patterns
-- [ ] **INT-04**: Context-aware suggestions recommend patterns based on current task
-- [ ] **INT-05**: Pattern lookup executes in <100ms (p95 latency)
-- [ ] **INT-06**: Tag indexing enables fast search without vector database
-- [ ] **INT-07**: Main skill orchestrates routing to sub-skills with context forking
-- [ ] **INT-08**: GSD integration allows automatic invocation during frontend work
+- [x] **INT-04**: Context-aware suggestions recommend patterns based on current task
+- [x] **INT-05**: Pattern lookup executes in <100ms (p95 latency)
+- [x] **INT-06**: Tag indexing enables fast search without vector database
+- [x] **INT-07**: Main skill orchestrates routing to sub-skills with context forking
+- [x] **INT-08**: GSD integration allows automatic invocation during frontend work
 
 ### Documentation & Quality
 
@@ -57,8 +57,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DOC-02**: Each pattern includes parameter descriptions
 - [x] **DOC-03**: Each pattern includes code examples for all supported frameworks
 - [x] **DOC-04**: Case studies document design rationale and best practices
-- [ ] **QUAL-01**: Validation gates prevent degraded patterns from storage
-- [ ] **QUAL-02**: Pattern quality baseline established through manual curation
+- [x] **QUAL-01**: Validation gates prevent degraded patterns from storage
+- [x] **QUAL-02**: Pattern quality baseline established through manual curation
 - [x] **QUAL-03**: Framework compatibility metadata tracks supported versions
 
 ## v2 Requirements
@@ -122,17 +122,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GEN-07 | Phase 2 | Complete |
 | GEN-08 | Phase 2 | Complete |
 | GEN-09 | Phase 2 | Complete |
-| INT-02 | Phase 3 | Pending |
+| INT-02 | Phase 3 | Complete |
 | INT-03 | Phase 2 | Complete |
-| EXTR-01 | Phase 3 | Pending |
-| EXTR-02 | Phase 3 | Pending |
-| EXTR-03 | Phase 3 | Pending |
-| EXTR-04 | Phase 3 | Pending |
-| EXTR-05 | Phase 3 | Pending |
-| EXTR-06 | Phase 3 | Pending |
-| EXTR-07 | Phase 3 | Pending |
-| EXTR-08 | Phase 3 | Pending |
-| EXTR-09 | Phase 3 | Pending |
+| EXTR-01 | Phase 3 | Complete |
+| EXTR-02 | Phase 3 | Complete |
+| EXTR-03 | Phase 3 | Complete |
+| EXTR-04 | Phase 3 | Complete |
+| EXTR-05 | Phase 3 | Complete |
+| EXTR-06 | Phase 3 | Complete |
+| EXTR-07 | Phase 3 | Complete |
+| EXTR-08 | Phase 3 | Complete |
+| EXTR-09 | Phase 3 | Complete |
 | GEN-04 | Phase 4 | Complete |
 | GEN-05 | Phase 4 | Complete |
 | DOC-01 | Phase 4 | Complete |
@@ -140,14 +140,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC-03 | Phase 4 | Complete |
 | DOC-04 | Phase 4 | Complete |
 | QUAL-03 | Phase 4 | Complete |
-| INT-01 | Phase 5 | Pending |
-| INT-04 | Phase 5 | Pending |
-| INT-05 | Phase 5 | Pending |
-| INT-06 | Phase 5 | Pending |
-| INT-07 | Phase 5 | Pending |
-| INT-08 | Phase 5 | Pending |
-| QUAL-01 | Phase 5 | Pending |
-| QUAL-02 | Phase 5 | Pending |
+| INT-01 | Phase 5 | Complete |
+| INT-04 | Phase 5 | Complete |
+| INT-05 | Phase 5 | Complete |
+| INT-06 | Phase 5 | Complete |
+| INT-07 | Phase 5 | Complete |
+| INT-08 | Phase 5 | Complete |
+| QUAL-01 | Phase 5 | Complete |
+| QUAL-02 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 39 total
@@ -156,4 +156,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 4 completion*
+*Last updated: 2026-02-02 after v1.0 milestone audit*
