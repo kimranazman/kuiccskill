@@ -24,6 +24,7 @@ This skill activates when the user's request involves:
 
 - **:generate** — Search patterns and generate framework-specific code
 - **:analyze** — Extract design patterns from a website URL
+- **:suggest** — Get context-aware pattern suggestions based on task description
 
 ## Pattern Categories
 
