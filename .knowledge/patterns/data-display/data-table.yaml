@@ -21,6 +21,41 @@ principles:
   - Sort indicators with aria-sort for accessibility
   - "Responsive: horizontal scroll or card view on mobile"
   - Align numbers right, text left for readability
+
+documentation:
+  description: "A responsive data table component with sticky headers, row hover states, and proper semantic markup. Supports column alignment, optional sorting, and horizontal scrolling on narrow viewports."
+  usage: "Pass column definitions with key, header, and alignment. Pass data array matching column keys. Optional caption for accessibility. Table auto-scrolls horizontally on mobile."
+  parameters:
+    - name: columns
+      type: "Column<T>[]"
+      description: Column definitions with key, header, align, and sortable flags
+      required: true
+    - name: data
+      type: "T[]"
+      description: Array of data objects matching column keys
+      required: true
+    - name: caption
+      type: string
+      description: Accessible caption describing the table purpose
+      required: false
+    - name: sortable
+      type: boolean
+      description: Enable column sorting
+      required: false
+      default: "false"
+  best_practices:
+    - "Use semantic table elements (table, thead, th, tbody, td)"
+    - "Add scope='col' to header cells"
+    - "Right-align numbers for easy comparison"
+    - "Add row hover states for better scannability"
+    - "Consider pagination for large datasets"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     interface Column<T> {
@@ -78,6 +113,102 @@ code_examples:
         </div>
       );
     }
+
+  vue: |
+    <script setup lang="ts" generic="T extends Record<string, unknown>">
+    interface Column<T> {
+      key: keyof T;
+      header: string;
+      align?: 'left' | 'right' | 'center';
+    }
+
+    interface Props {
+      columns: Column<T>[];
+      data: T[];
+      caption?: string;
+    }
+
+    defineProps<Props>();
+    </script>
+    <template>
+      <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table class="w-full text-sm">
+          <caption v-if="caption" class="sr-only">{{ caption }}</caption>
+          <thead class="bg-gray-50 sticky top-0">
+            <tr>
+              <th
+                v-for="col in columns"
+                :key="String(col.key)"
+                scope="col"
+                :class="['px-4 py-3 font-semibold text-gray-900', `text-${col.align || 'left'}`]"
+              >
+                {{ col.header }}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr
+              v-for="(row, i) in data"
+              :key="i"
+              class="hover:bg-gray-50 transition-colors"
+            >
+              <td
+                v-for="col in columns"
+                :key="String(col.key)"
+                :class="['px-4 py-3', `text-${col.align || 'left'}`]"
+              >
+                {{ row[col.key] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      interface Column {
+        key: string;
+        header: string;
+        align?: 'left' | 'right' | 'center';
+      }
+
+      export let columns: Column[] = [];
+      export let data: Record<string, unknown>[] = [];
+      export let caption: string = '';
+    </script>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="w-full text-sm">
+        {#if caption}
+          <caption class="sr-only">{caption}</caption>
+        {/if}
+        <thead class="bg-gray-50 sticky top-0">
+          <tr>
+            {#each columns as col}
+              <th
+                scope="col"
+                class="px-4 py-3 font-semibold text-gray-900 text-{col.align || 'left'}"
+              >
+                {col.header}
+              </th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {#each data as row, i}
+            <tr class="hover:bg-gray-50 transition-colors">
+              {#each columns as col}
+                <td class="px-4 py-3 text-{col.align || 'left'}">
+                  {row[col.key]}
+                </td>
+              {/each}
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+
   vanilla: |-
     .data-table-wrapper {
       overflow-x: auto;

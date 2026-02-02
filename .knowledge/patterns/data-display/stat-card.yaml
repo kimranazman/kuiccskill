@@ -21,6 +21,40 @@ principles:
   - Trend indicator with color and icon for context
   - Compact layout that works in grid dashboards
   - Optional icon to reinforce metric category
+
+documentation:
+  description: "A compact card component for displaying key metrics with a large prominent value, label, and optional trend indicator. Perfect for dashboards and KPI displays. Includes visual trend feedback with colors and icons."
+  usage: "Pass label, value, and optional change percentage. Positive changes show green with up arrow, negative show red with down arrow. Optional icon reinforces the metric category."
+  parameters:
+    - name: label
+      type: string
+      description: Metric label/title
+      required: true
+    - name: value
+      type: string | number
+      description: The main metric value to display prominently
+      required: true
+    - name: change
+      type: number
+      description: Percentage change (positive or negative)
+      required: false
+    - name: icon
+      type: "React.ReactNode"
+      description: Optional icon to reinforce metric category
+      required: false
+  best_practices:
+    - "Use proper heading hierarchy for labels"
+    - "Add sr-only text for screen readers on trend indicators"
+    - "Don't rely solely on color for positive/negative trends"
+    - "Keep values formatted consistently (e.g., always show +/- for changes)"
+    - "Use icons to reinforce metric type (users, revenue, etc.)"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     interface StatCardProps {
@@ -68,6 +102,90 @@ code_examples:
         </article>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    import { computed } from 'vue';
+
+    interface Props {
+      label: string;
+      value: string | number;
+      change?: number;
+    }
+
+    const props = defineProps<Props>();
+
+    const isPositive = computed(() => props.change !== undefined && props.change > 0);
+    const isNegative = computed(() => props.change !== undefined && props.change < 0);
+    const trendClass = computed(() => {
+      if (isPositive.value) return 'text-green-600';
+      if (isNegative.value) return 'text-red-600';
+      return 'text-gray-500';
+    });
+    </script>
+    <template>
+      <article class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm text-gray-500 font-medium">{{ label }}</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">{{ value }}</p>
+            <div v-if="change !== undefined" class="flex items-center mt-2 gap-1">
+              <span :class="trendClass">
+                <slot name="trend-icon" :positive="isPositive" :negative="isNegative" />
+              </span>
+              <span :class="['text-sm font-medium', trendClass]">
+                {{ isPositive ? '+' : '' }}{{ change }}%
+              </span>
+              <span class="sr-only">
+                {{ isPositive ? 'increase' : isNegative ? 'decrease' : 'no change' }}
+              </span>
+            </div>
+          </div>
+          <div v-if="$slots.icon" class="p-3 bg-blue-50 rounded-lg text-blue-600">
+            <slot name="icon" />
+          </div>
+        </div>
+      </article>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      export let label: string;
+      export let value: string | number;
+      export let change: number | undefined = undefined;
+
+      $: isPositive = change !== undefined && change > 0;
+      $: isNegative = change !== undefined && change < 0;
+      $: trendClass = isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-500';
+    </script>
+
+    <article class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm text-gray-500 font-medium">{label}</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+          {#if change !== undefined}
+            <div class="flex items-center mt-2 gap-1">
+              <span class={trendClass}>
+                <slot name="trend-icon" {isPositive} {isNegative} />
+              </span>
+              <span class="text-sm font-medium {trendClass}">
+                {isPositive ? '+' : ''}{change}%
+              </span>
+              <span class="sr-only">
+                {isPositive ? 'increase' : isNegative ? 'decrease' : 'no change'}
+              </span>
+            </div>
+          {/if}
+        </div>
+        {#if $$slots.icon}
+          <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+            <slot name="icon" />
+          </div>
+        {/if}
+      </div>
+    </article>
+
   vanilla: |-
     .stat-card {
       background: white;
