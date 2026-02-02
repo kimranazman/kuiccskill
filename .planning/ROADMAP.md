@@ -70,10 +70,15 @@ Plans:
   7. Extraction identifies micro-interactions (hover states, click feedback, transitions)
   8. Case study Markdown documentation generated with design rationale
   9. Extracted patterns validated against YAML schema before storage
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Browser automation (Playwright page fetching, computed styles extraction)
+- [ ] 03-02-PLAN.md — CSS analyzer (CSSTree parsing, animation/layout/interaction detection)
+- [ ] 03-03-PLAN.md — DOM analyzer (HTML structure analysis, component identification)
+- [ ] 03-04-PLAN.md — Pattern identifier (AI-powered pattern recognition, YAML generation)
+- [ ] 03-05-PLAN.md — Case study generator (Markdown documentation with design rationale)
+- [ ] 03-06-PLAN.md — Skill integration (:analyze sub-command, orchestration)
 
 ### Phase 4: Multi-Framework & Documentation
 **Goal**: Expand framework support and complete pattern documentation
@@ -117,6 +122,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Pattern Storage Foundation | 3/3 | Complete | 2026-02-02 |
 | 2. Code Generation Engine | 5/5 | Complete | 2026-02-02 |
-| 3. Pattern Extraction | 0/0 | Not started | - |
+| 3. Pattern Extraction | 0/6 | Planned | - |
 | 4. Multi-Framework & Documentation | 0/0 | Not started | - |
 | 5. Integration & Performance | 0/0 | Not started | - |
