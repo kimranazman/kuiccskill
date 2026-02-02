@@ -18,15 +18,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Code Generation
 
-- [ ] **GEN-01**: Generate code from pattern using template system
-- [ ] **GEN-02**: Context-aware application detects project framework automatically
-- [ ] **GEN-03**: Multi-framework support generates React code from patterns
+- [x] **GEN-01**: Generate code from pattern using template system
+- [x] **GEN-02**: Context-aware application detects project framework automatically
+- [x] **GEN-03**: Multi-framework support generates React code from patterns
 - [ ] **GEN-04**: Multi-framework support generates Vue code from patterns
 - [ ] **GEN-05**: Multi-framework support generates vanilla JS/CSS from patterns
-- [ ] **GEN-06**: Template-based generation uses Handlebars for framework-agnostic patterns
-- [ ] **GEN-07**: Copy-to-clipboard functionality with confirmation feedback
-- [ ] **GEN-08**: Code preview displays syntax-highlighted generated code
-- [ ] **GEN-09**: Framework detection analyzes package.json and project structure
+- [x] **GEN-06**: Template-based generation uses Handlebars for framework-agnostic patterns
+- [x] **GEN-07**: Copy-to-clipboard functionality with confirmation feedback
+- [x] **GEN-08**: Code preview displays syntax-highlighted generated code
+- [x] **GEN-09**: Framework detection analyzes package.json and project structure
 
 ### Pattern Extraction
 
@@ -44,7 +44,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **INT-01**: Auto-enhancement integrates with frontend-design skill workflow
 - [ ] **INT-02**: Sub-command `:analyze` triggers pattern extraction from URL
-- [ ] **INT-03**: Sub-command `:generate` triggers code generation from stored patterns
+- [x] **INT-03**: Sub-command `:generate` triggers code generation from stored patterns
 - [ ] **INT-04**: Context-aware suggestions recommend patterns based on current task
 - [ ] **INT-05**: Pattern lookup executes in <100ms (p95 latency)
 - [ ] **INT-06**: Tag indexing enables fast search without vector database
@@ -115,15 +115,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STOR-04 | Phase 1 | Complete |
 | STOR-05 | Phase 1 | Complete |
 | STOR-06 | Phase 1 | Complete |
-| GEN-01 | Phase 2 | Pending |
-| GEN-02 | Phase 2 | Pending |
-| GEN-03 | Phase 2 | Pending |
-| GEN-06 | Phase 2 | Pending |
-| GEN-07 | Phase 2 | Pending |
-| GEN-08 | Phase 2 | Pending |
-| GEN-09 | Phase 2 | Pending |
-| INT-02 | Phase 2 | Pending |
-| INT-03 | Phase 2 | Pending |
+| GEN-01 | Phase 2 | Complete |
+| GEN-02 | Phase 2 | Complete |
+| GEN-03 | Phase 2 | Complete |
+| GEN-06 | Phase 2 | Complete |
+| GEN-07 | Phase 2 | Complete |
+| GEN-08 | Phase 2 | Complete |
+| GEN-09 | Phase 2 | Complete |
+| INT-02 | Phase 3 | Pending |
+| INT-03 | Phase 2 | Complete |
 | EXTR-01 | Phase 3 | Pending |
 | EXTR-02 | Phase 3 | Pending |
 | EXTR-03 | Phase 3 | Pending |
@@ -156,4 +156,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after Phase 1 completion*
+*Last updated: 2026-02-02 after Phase 2 completion*
