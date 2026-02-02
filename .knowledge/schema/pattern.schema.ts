@@ -38,8 +38,15 @@ export const PatternSchema = z.object({
   /** Design principles and guidelines */
   principles: z.array(z.string()).min(1),
 
-  /** Framework-specific code examples */
-  code_examples: z.record(z.enum(FRAMEWORKS), z.string()).optional(),
+  /** Framework-specific code examples (partial - not all frameworks required) */
+  code_examples: z
+    .object({
+      react: z.string().optional(),
+      vue: z.string().optional(),
+      svelte: z.string().optional(),
+      vanilla: z.string().optional(),
+    })
+    .optional(),
 
   /** Source/origin information */
   source: SourceSchema.optional(),
