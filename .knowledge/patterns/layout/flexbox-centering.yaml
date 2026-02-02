@@ -1,0 +1,63 @@
+name: Flexbox Centering
+category: layout
+tags:
+  - flexbox
+  - centering
+  - alignment
+  - utility
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+principles:
+  - Use flex with items-center and justify-center for perfect centering
+  - Prefer gap over margins for spacing between flex children
+  - Use flex-1 to allow items to grow and fill available space
+  - "min-height: 100vh for full viewport centering"
+  - Consider flex-wrap for responsive layouts without media queries
+code_examples:
+  react: >-
+    // Perfect center (both axes)
+
+    const Center = ({ children }: { children: React.ReactNode }) => (
+      <div className="flex items-center justify-center min-h-screen">
+        {children}
+      </div>
+    );
+
+
+    // Horizontal center with gap
+
+    const HStack = ({ children, gap = 4 }: { children: React.ReactNode; gap?:
+    number }) => (
+      <div className={`flex items-center gap-${gap}`}>{children}</div>
+    );
+
+
+    // Vertical center with gap
+
+    const VStack = ({ children, gap = 4 }: { children: React.ReactNode; gap?:
+    number }) => (
+      <div className={`flex flex-col items-center gap-${gap}`}>{children}</div>
+    );
+  vanilla: |-
+    .center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .hstack {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .vstack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }

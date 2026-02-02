@@ -1,0 +1,91 @@
+name: Toast Notification
+category: feedback
+tags:
+  - toast
+  - notification
+  - alert
+  - feedback
+  - snackbar
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Use role="status" for non-critical and role="alert" for errors. Apply
+    aria-live="polite" for status updates.
+  wcag_level: AA
+principles:
+  - Non-blocking feedback that auto-dismisses
+  - Positioned in corner (typically bottom-right) for visibility
+  - Variants for success, error, warning, and info states
+  - Manual dismiss option for user control
+  - Animation for smooth appearance and exit
+code_examples:
+  react: >-
+    type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+
+    interface ToastProps {
+      message: string;
+      type: ToastType;
+      onDismiss: () => void;
+    }
+
+
+    const Toast = ({ message, type, onDismiss }: ToastProps) => {
+      const styles = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-500 text-white',
+        warning: 'bg-yellow-500 text-black',
+        info: 'bg-blue-500 text-white',
+      };
+
+      const icons = {
+        success: <CheckCircleIcon />,
+        error: <XCircleIcon />,
+        warning: <ExclamationIcon />,
+        info: <InfoIcon />,
+      };
+
+      return (
+        <div
+          role={type === 'error' ? 'alert' : 'status'}
+          aria-live={type === 'error' ? 'assertive' : 'polite'}
+          className={`fixed bottom-4 right-4 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slide-up ${styles[type]}`}
+        >
+          {icons[type]}
+          <span>{message}</span>
+          <button
+            onClick={onDismiss}
+            className="ml-2 hover:opacity-70 transition-opacity"
+            aria-label="Dismiss"
+          >
+            <XIcon className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    };
+  vanilla: |-
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .toast-success { background: #22c55e; color: white; }
+    .toast-error { background: #ef4444; color: white; }
+    .toast-warning { background: #eab308; color: black; }
+    .toast-info { background: #3b82f6; color: white; }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }

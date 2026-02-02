@@ -1,0 +1,198 @@
+name: Login Form
+category: authentication
+tags:
+  - login
+  - auth
+  - form
+  - password
+  - security
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Use autocomplete attributes for browser autofill. Associate labels with
+    inputs. Announce errors to screen readers.
+  wcag_level: AA
+principles:
+  - Clear, minimal layout focusing on the action
+  - Show/hide password toggle for usability
+  - Error handling with inline validation
+  - Remember me option for convenience
+  - Forgot password link prominently placed
+  - Loading state on submit to prevent double-clicks
+code_examples:
+  react: >-
+    import { useState, FormEvent } from 'react';
+
+
+    interface LoginFormProps {
+      onSubmit: (email: string, password: string, remember: boolean) => Promise<void>;
+    }
+
+
+    const LoginForm = ({ onSubmit }: LoginFormProps) => {
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [showPassword, setShowPassword] = useState(false);
+      const [remember, setRemember] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+
+      const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+          await onSubmit(email, password, remember);
+        } catch (err) {
+          setError('Invalid email or password');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-sm mx-auto">
+          <h1 className="text-2xl font-bold text-center">Sign In</h1>
+
+          {error && (
+            <div role="alert" className="p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                className="rounded"
+              />
+              Remember me
+            </label>
+            <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+              Forgot password?
+            </a>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+      );
+    };
+  vanilla: >-
+    <form class="login-form" id="loginForm">
+      <h1 class="login-title">Sign In</h1>
+
+      <div id="errorAlert" class="error-alert hidden" role="alert"></div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" autocomplete="current-password" required>
+          <button type="button" id="togglePassword" aria-label="Show password">
+            <svg><!-- eye icon --></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember">
+          Remember me
+        </label>
+        <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="submit-btn">Sign In</button>
+    </form>
+
+
+    <style>
+
+    .login-form { max-width: 24rem; margin: 0 auto; }
+
+    .login-title { font-size: 1.5rem; font-weight: 700; text-align: center;
+    margin-bottom: 1.5rem; }
+
+    .form-group { margin-bottom: 1rem; }
+
+    .form-group label { display: block; font-size: 0.875rem; font-weight: 500;
+    margin-bottom: 0.25rem; }
+
+    .form-group input { width: 100%; padding: 0.5rem 1rem; border: 1px solid
+    #d1d5db; border-radius: 0.5rem; }
+
+    .password-wrapper { position: relative; }
+
+    .password-wrapper button { position: absolute; right: 0.75rem; top: 50%;
+    transform: translateY(-50%); }
+
+    .form-options { display: flex; justify-content: space-between; align-items:
+    center; margin-bottom: 1.5rem; }
+
+    .submit-btn { width: 100%; padding: 0.75rem; background: #2563eb; color:
+    white; border-radius: 0.5rem; font-weight: 500; }
+
+    .submit-btn:hover { background: #1d4ed8; }
+
+    .error-alert { padding: 0.75rem; background: #fef2f2; color: #b91c1c;
+    border-radius: 0.5rem; margin-bottom: 1rem; }
+
+    .hidden { display: none; }
+
+    </style>

@@ -1,0 +1,111 @@
+name: Form Validation States
+category: forms
+tags:
+  - validation
+  - error
+  - form
+  - states
+  - feedback
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Use aria-invalid for error state. Associate error message with
+    aria-describedby. Use aria-live region for dynamic errors.
+  wcag_level: AA
+principles:
+  - Clear visual distinction between error, success, and neutral states
+  - Error messages appear below input with icon for quick scanning
+  - Color is not the only indicator (use icons and text)
+  - Inline validation provides immediate feedback
+  - Group related error messages for screen readers with live regions
+code_examples:
+  react: >-
+    type ValidationState = 'idle' | 'error' | 'success';
+
+
+    interface ValidatedInputProps {
+      id: string;
+      label: string;
+      value: string;
+      onChange: (value: string) => void;
+      state: ValidationState;
+      errorMessage?: string;
+      successMessage?: string;
+    }
+
+
+    const ValidatedInput = ({
+      id,
+      label,
+      value,
+      onChange,
+      state,
+      errorMessage,
+      successMessage,
+    }: ValidatedInputProps) => {
+      const errorId = `${id}-error`;
+
+      return (
+        <div>
+          <label htmlFor={id} className="block text-sm font-medium mb-1">
+            {label}
+          </label>
+          <div className="relative">
+            <input
+              id={id}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              aria-invalid={state === 'error'}
+              aria-describedby={state === 'error' ? errorId : undefined}
+              className={`w-full px-4 py-2 border-2 rounded-lg outline-none transition-colors ${
+                state === 'error'
+                  ? 'border-red-500 bg-red-50'
+                  : state === 'success'
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-gray-200 focus:border-blue-500'
+              }`}
+            />
+            {state !== 'idle' && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                {state === 'error' ? <ErrorIcon /> : <CheckIcon />}
+              </span>
+            )}
+          </div>
+          {state === 'error' && errorMessage && (
+            <p id={errorId} className="mt-1 text-sm text-red-600 flex items-center gap-1" role="alert">
+              <AlertIcon className="w-4 h-4" />
+              {errorMessage}
+            </p>
+          )}
+          {state === 'success' && successMessage && (
+            <p className="mt-1 text-sm text-green-600">{successMessage}</p>
+          )}
+        </div>
+      );
+    };
+  vanilla: |-
+    .input-wrapper { margin-bottom: 1rem; }
+
+    .input {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .input:focus { border-color: #3b82f6; outline: none; }
+    .input.error { border-color: #ef4444; background-color: #fef2f2; }
+    .input.success { border-color: #22c55e; background-color: #f0fdf4; }
+
+    .error-message {
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      color: #dc2626;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }

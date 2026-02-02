@@ -1,0 +1,120 @@
+name: Ripple Effect
+category: micro-interactions
+tags:
+  - ripple
+  - click
+  - material
+  - feedback
+  - touch
+frameworks:
+  - react
+  - vanilla
+accessibility:
+  notes: Ripple is purely visual feedback. Core button functionality must work
+    without the effect. Respect prefers-reduced-motion.
+  wcag_level: A
+principles:
+  - Ripple originates from click/touch point for direct feedback
+  - Circular expansion with opacity fade creates wave effect
+  - Short duration (300-500ms) for snappy response
+  - Contained within button bounds using overflow hidden
+  - Remove ripple element after animation completes
+code_examples:
+  react: >-
+    import { useState, useRef, MouseEvent } from 'react';
+
+
+    interface Ripple {
+      x: number;
+      y: number;
+      id: number;
+    }
+
+
+    const RippleButton = ({ children, ...props }:
+    React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+      const [ripples, setRipples] = useState<Ripple[]>([]);
+      const buttonRef = useRef<HTMLButtonElement>(null);
+
+      const addRipple = (e: MouseEvent<HTMLButtonElement>) => {
+        const button = buttonRef.current;
+        if (!button) return;
+
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const id = Date.now();
+
+        setRipples((prev) => [...prev, { x, y, id }]);
+        setTimeout(() => {
+          setRipples((prev) => prev.filter((r) => r.id !== id));
+        }, 500);
+      };
+
+      return (
+        <button
+          ref={buttonRef}
+          onClick={addRipple}
+          className="relative overflow-hidden px-6 py-3 bg-blue-600 text-white rounded-lg"
+          {...props}
+        >
+          {ripples.map((ripple) => (
+            <span
+              key={ripple.id}
+              className="absolute bg-white/30 rounded-full animate-ripple pointer-events-none"
+              style={{
+                left: ripple.x,
+                top: ripple.y,
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          ))}
+          <span className="relative z-10">{children}</span>
+        </button>
+      );
+    };
+
+
+    // Add to tailwind.config.js:
+
+    // animation: { ripple: 'ripple 0.5s ease-out' }
+
+    // keyframes: { ripple: { '0%': { width: '0', height: '0', opacity: '0.5' },
+    '100%': { width: '200px', height: '200px', opacity: '0' } } }
+  vanilla: |-
+    .ripple-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: ripple 0.5s ease-out forwards;
+    }
+
+    @keyframes ripple {
+      from {
+        width: 0;
+        height: 0;
+        opacity: 0.5;
+      }
+      to {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+      }
+    }
+
+    // JavaScript:
+    // button.addEventListener('click', (e) => {
+    //   const ripple = document.createElement('span');
+    //   ripple.className = 'ripple';
+    //   ripple.style.left = e.offsetX + 'px';
+    //   ripple.style.top = e.offsetY + 'px';
+    //   button.appendChild(ripple);
+    //   setTimeout(() => ripple.remove(), 500);
+    // });

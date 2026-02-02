@@ -1,0 +1,77 @@
+name: Button Hover Effect
+category: micro-interactions
+tags:
+  - button
+  - hover
+  - animation
+  - interaction
+  - transform
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Hover effects are visual enhancement only. Ensure button functionality
+    works without hover. Respect prefers-reduced-motion.
+  wcag_level: AA
+principles:
+  - Subtle scale transform (1.02-1.05) for lift effect
+  - Shadow elevation increases on hover for depth
+  - Color shift provides additional feedback
+  - Cubic-bezier easing for natural feel
+  - Active state slightly reduces scale for press feedback
+code_examples:
+  react: >-
+    const Button = ({
+      children,
+      variant = 'primary',
+      ...props
+    }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+      variant?: 'primary' | 'secondary';
+    }) => {
+      const baseStyles = `
+        px-6 py-3 rounded-lg font-medium
+        transform transition-all duration-200 ease-out
+        hover:scale-105 hover:shadow-lg
+        active:scale-95
+        focus:outline-none focus:ring-2 focus:ring-offset-2
+        motion-reduce:transform-none motion-reduce:transition-none
+      `;
+
+      const variants = {
+        primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+        secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
+      };
+
+      return (
+        <button className={`${baseStyles} ${variants[variant]}`} {...props}>
+          {children}
+        </button>
+      );
+    };
+  vanilla: >-
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      transform: translateY(0);
+      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s;
+    }
+
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn { transition: none; transform: none; }
+      .btn:hover, .btn:active { transform: none; }
+    }

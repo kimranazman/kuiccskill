@@ -1,0 +1,103 @@
+name: Stat Card
+category: data-display
+tags:
+  - stats
+  - dashboard
+  - card
+  - metrics
+  - kpi
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Use proper heading hierarchy. Add sr-only labels for trend indicators.
+    Ensure color is not the only indicator of positive/negative trends.
+  wcag_level: AA
+principles:
+  - Large prominent number for quick scanning
+  - Clear label above or below the value
+  - Trend indicator with color and icon for context
+  - Compact layout that works in grid dashboards
+  - Optional icon to reinforce metric category
+code_examples:
+  react: >-
+    interface StatCardProps {
+      label: string;
+      value: string | number;
+      change?: number;
+      icon?: React.ReactNode;
+    }
+
+
+    const StatCard = ({ label, value, change, icon }: StatCardProps) => {
+      const isPositive = change && change > 0;
+      const isNegative = change && change < 0;
+
+      return (
+        <article className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-gray-500 font-medium">{label}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+              {change !== undefined && (
+                <div className="flex items-center mt-2 gap-1">
+                  <span className={isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-500'}>
+                    {isPositive ? <TrendUpIcon /> : isNegative ? <TrendDownIcon /> : null}
+                  </span>
+                  <span
+                    className={`text-sm font-medium ${
+                      isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-500'
+                    }`}
+                  >
+                    {isPositive && '+'}{change}%
+                  </span>
+                  <span className="sr-only">
+                    {isPositive ? 'increase' : isNegative ? 'decrease' : 'no change'}
+                  </span>
+                </div>
+              )}
+            </div>
+            {icon && (
+              <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
+                {icon}
+              </div>
+            )}
+          </div>
+        </article>
+      );
+    };
+  vanilla: |-
+    .stat-card {
+      background: white;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #f3f4f6;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #111827;
+      margin-top: 0.25rem;
+    }
+
+    .stat-change {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .stat-change.positive { color: #16a34a; }
+    .stat-change.negative { color: #dc2626; }

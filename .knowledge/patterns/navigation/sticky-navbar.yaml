@@ -1,0 +1,81 @@
+name: Sticky Navbar
+category: navigation
+tags:
+  - navbar
+  - sticky
+  - header
+  - scroll
+  - shadow
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Include skip link as first focusable element. Use nav landmark with
+    aria-label. Ensure sufficient color contrast.
+  wcag_level: AA
+principles:
+  - "Use position: sticky for native scroll-aware positioning"
+  - Add shadow on scroll to indicate elevation and separation
+  - Maintain consistent height to prevent layout shift
+  - Use z-index layering system (e.g., z-50 for nav)
+  - Backdrop blur effect for glassmorphism style
+code_examples:
+  react: >-
+    import { useState, useEffect } from 'react';
+
+
+    const Navbar = () => {
+      const [scrolled, setScrolled] = useState(false);
+
+      useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 10);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      return (
+        <>
+          <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-white">
+            Skip to content
+          </a>
+          <nav
+            className={`sticky top-0 z-50 transition-all duration-300 ${
+              scrolled
+                ? 'bg-white/80 backdrop-blur-md shadow-md'
+                : 'bg-transparent'
+            }`}
+            aria-label="Main navigation"
+          >
+            <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+              <Logo />
+              <NavLinks />
+            </div>
+          </nav>
+        </>
+      );
+    };
+  vanilla: |-
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 4rem;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .navbar.scrolled {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .skip-link {
+      position: absolute;
+      transform: translateY(-100%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }

@@ -1,0 +1,114 @@
+name: Data Table
+category: data-display
+tags:
+  - table
+  - data
+  - grid
+  - sorting
+  - responsive
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Use proper th/td with scope attributes. Add caption for table purpose.
+    Support keyboard navigation for interactive tables.
+  wcag_level: AA
+principles:
+  - Sticky header for long tables to maintain context
+  - Zebra striping or row hover for scanability
+  - Sort indicators with aria-sort for accessibility
+  - "Responsive: horizontal scroll or card view on mobile"
+  - Align numbers right, text left for readability
+code_examples:
+  react: >-
+    interface Column<T> {
+      key: keyof T;
+      header: string;
+      align?: 'left' | 'right' | 'center';
+      sortable?: boolean;
+    }
+
+
+    interface DataTableProps<T> {
+      columns: Column<T>[];
+      data: T[];
+      caption?: string;
+    }
+
+
+    function DataTable<T extends Record<string, unknown>>({
+      columns,
+      data,
+      caption,
+    }: DataTableProps<T>) {
+      return (
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
+          <table className="w-full text-sm">
+            {caption && <caption className="sr-only">{caption}</caption>}
+            <thead className="bg-gray-50 sticky top-0">
+              <tr>
+                {columns.map((col) => (
+                  <th
+                    key={String(col.key)}
+                    scope="col"
+                    className={`px-4 py-3 font-semibold text-gray-900 text-${col.align || 'left'}`}
+                  >
+                    {col.header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {data.map((row, i) => (
+                <tr key={i} className="hover:bg-gray-50 transition-colors">
+                  {columns.map((col) => (
+                    <td
+                      key={String(col.key)}
+                      className={`px-4 py-3 text-${col.align || 'left'}`}
+                    >
+                      {String(row[col.key])}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+  vanilla: |-
+    .data-table-wrapper {
+      overflow-x: auto;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+    }
+
+    .data-table {
+      width: 100%;
+      font-size: 0.875rem;
+      border-collapse: collapse;
+    }
+
+    .data-table thead {
+      background: #f9fafb;
+      position: sticky;
+      top: 0;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+
+    .data-table tbody tr {
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .text-right { text-align: right; }

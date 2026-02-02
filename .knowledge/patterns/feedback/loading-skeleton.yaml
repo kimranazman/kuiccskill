@@ -1,0 +1,72 @@
+name: Loading Skeleton
+category: feedback
+tags:
+  - skeleton
+  - loading
+  - placeholder
+  - animation
+  - shimmer
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Use aria-busy="true" on loading container. Add aria-label describing
+    loading state. Hide skeletons from screen readers.
+  wcag_level: AA
+principles:
+  - Skeleton shape matches content layout to prevent shift
+  - Subtle shimmer animation indicates loading without distraction
+  - Preserve layout dimensions for seamless transition
+  - Use neutral gray tones that work in light/dark modes
+  - Pulse or wave animation for visual feedback
+code_examples:
+  react: |-
+    const Skeleton = ({ className = '' }: { className?: string }) => (
+      <div
+        className={`animate-pulse bg-gray-200 rounded ${className}`}
+        aria-hidden="true"
+      />
+    );
+
+    const CardSkeleton = () => (
+      <div aria-busy="true" aria-label="Loading content" className="space-y-4">
+        <Skeleton className="h-48 w-full" /> {/* Image */}
+        <Skeleton className="h-6 w-3/4" /> {/* Title */}
+        <Skeleton className="h-4 w-full" /> {/* Description line 1 */}
+        <Skeleton className="h-4 w-5/6" /> {/* Description line 2 */}
+      </div>
+    );
+
+    const TextSkeleton = ({ lines = 3 }: { lines?: number }) => (
+      <div aria-busy="true" aria-label="Loading text" className="space-y-2">
+        {Array.from({ length: lines }).map((_, i) => (
+          <Skeleton
+            key={i}
+            className={`h-4 ${i === lines - 1 ? 'w-4/5' : 'w-full'}`}
+          />
+        ))}
+      </div>
+    );
+  vanilla: |-
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 0.25rem;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-text { height: 1rem; margin-bottom: 0.5rem; }
+    .skeleton-title { height: 1.5rem; width: 75%; }
+    .skeleton-image { height: 12rem; width: 100%; }

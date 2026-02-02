@@ -1,0 +1,115 @@
+name: Mobile Drawer Menu
+category: navigation
+tags:
+  - drawer
+  - mobile
+  - menu
+  - sidebar
+  - off-canvas
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Implement focus trap when open. Support Escape key to close. Use
+    aria-expanded on trigger. Return focus to trigger on close.
+  wcag_level: AA
+principles:
+  - Off-canvas pattern with slide-in animation
+  - Semi-transparent backdrop to indicate modality
+  - Focus trap to keep keyboard navigation within drawer
+  - Escape key closes drawer for keyboard users
+  - Transform-based animation for GPU acceleration
+code_examples:
+  react: >-
+    import { useEffect, useRef } from 'react';
+
+
+    interface DrawerProps {
+      isOpen: boolean;
+      onClose: () => void;
+      children: React.ReactNode;
+    }
+
+
+    const Drawer = ({ isOpen, onClose, children }: DrawerProps) => {
+      const drawerRef = useRef<HTMLDivElement>(null);
+
+      useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+          if (e.key === 'Escape') onClose();
+        };
+
+        if (isOpen) {
+          document.addEventListener('keydown', handleEscape);
+          document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+          document.removeEventListener('keydown', handleEscape);
+          document.body.style.overflow = '';
+        };
+      }, [isOpen, onClose]);
+
+      return (
+        <>
+          {/* Backdrop */}
+          <div
+            className={`fixed inset-0 bg-black/50 z-40 transition-opacity ${
+              isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+            onClick={onClose}
+            aria-hidden="true"
+          />
+          {/* Drawer */}
+          <nav
+            ref={drawerRef}
+            className={`fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300 ${
+              isOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+            aria-label="Mobile menu"
+          >
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2"
+              aria-label="Close menu"
+            >
+              <XIcon />
+            </button>
+            <div className="pt-16 px-4">{children}</div>
+          </nav>
+        </>
+      );
+    };
+  vanilla: |-
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 40;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 18rem;
+      background: white;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-out;
+      z-index: 50;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }

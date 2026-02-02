@@ -1,0 +1,83 @@
+name: Responsive Card Grid
+category: layout
+tags:
+  - cards
+  - grid
+  - responsive
+  - e-commerce
+  - auto-fit
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Include alt text for all card images. Ensure interactive cards have
+    proper focus states and keyboard navigation.
+  wcag_level: AA
+principles:
+  - Use auto-fit or auto-fill with minmax for fluid responsive grids
+  - Apply aspect-ratio for consistent image dimensions
+  - Subtle hover states with transform and shadow for interactivity
+  - Group related content visually with consistent card structure
+  - Maintain readable line lengths within cards (45-75 characters)
+code_examples:
+  react: >-
+    interface CardProps {
+      image: string;
+      title: string;
+      description: string;
+      onClick?: () => void;
+    }
+
+
+    const Card = ({ image, title, description, onClick }: CardProps) => (
+      <article
+        className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+        onClick={onClick}
+      >
+        <div className="aspect-[4/3] overflow-hidden">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+        <div className="p-4">
+          <h3 className="font-semibold text-lg mb-2">{title}</h3>
+          <p className="text-gray-600 text-sm line-clamp-2">{description}</p>
+        </div>
+      </article>
+    );
+
+
+    const CardGrid = ({ children }: { children: React.ReactNode }) => (
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+        {children}
+      </div>
+    );
+  vanilla: |-
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+
+    .card:hover {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+
+    .card-image {
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      width: 100%;
+    }

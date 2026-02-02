@@ -1,0 +1,98 @@
+name: Floating Label Input
+category: forms
+tags:
+  - input
+  - label
+  - animation
+  - focus
+  - material
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+accessibility:
+  notes: Label must always be visible (not reliant on placeholder). Use proper
+    label-input association. Ensure 4.5:1 contrast ratio.
+  wcag_level: AA
+principles:
+  - Label starts as placeholder, floats up on focus/content
+  - Smooth transition with transform and scale for polish
+  - Clear visual hierarchy with color change on focus
+  - Always visible label state for accessibility
+  - Input border color indicates focus state clearly
+code_examples:
+  react: >-
+    interface FloatingInputProps {
+      id: string;
+      label: string;
+      type?: string;
+      value: string;
+      onChange: (value: string) => void;
+    }
+
+
+    const FloatingInput = ({ id, label, type = 'text', value, onChange }:
+    FloatingInputProps) => {
+      const hasValue = value.length > 0;
+
+      return (
+        <div className="relative">
+          <input
+            id={id}
+            type={type}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="peer w-full px-4 pt-5 pb-2 border-2 border-gray-200 rounded-lg outline-none focus:border-blue-500 transition-colors"
+            placeholder=" "
+          />
+          <label
+            htmlFor={id}
+            className={`absolute left-4 transition-all duration-200 pointer-events-none
+              ${hasValue || 'peer-focus'}
+                ? 'top-1 text-xs text-blue-500'
+                : 'top-1/2 -translate-y-1/2 text-gray-400'
+              }
+              peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-500
+            `}
+          >
+            {label}
+          </label>
+        </div>
+      );
+    };
+  vanilla: |-
+    .floating-input-wrapper {
+      position: relative;
+    }
+
+    .floating-input {
+      width: 100%;
+      padding: 1.25rem 1rem 0.5rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .floating-input:focus {
+      border-color: #3b82f6;
+    }
+
+    .floating-label {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      pointer-events: none;
+      transition: all 0.2s;
+    }
+
+    .floating-input:focus + .floating-label,
+    .floating-input:not(:placeholder-shown) + .floating-label {
+      top: 0.25rem;
+      transform: translateY(0);
+      font-size: 0.75rem;
+      color: #3b82f6;
+    }
