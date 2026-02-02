@@ -62,3 +62,48 @@ When using :analyze, the extraction pipeline:
 5. Identifies patterns with AI assistance
 6. Saves patterns to `.knowledge/patterns/{category}/`
 7. Generates case study to `.knowledge/case-studies/`
+
+## Workflow Integration
+
+KUI Design integrates with frontend development workflows:
+
+### Auto-Enhancement Mode
+
+When configured in CLAUDE.md, KUI Design automatically suggests patterns during frontend work:
+- Detects component types from task description
+- Suggests relevant patterns with relevance scores
+- Provides code generation on pattern selection
+
+See `skills/kui-design/hooks/frontend-enhance.md` for setup instructions.
+
+### Sub-Command Orchestration
+
+The main skill routes to sub-commands based on user intent:
+
+| Intent | Command | Example |
+|--------|---------|---------|
+| Get suggestions | :suggest | "What patterns for a form?" |
+| Generate code | :generate | "Generate the login form" |
+| Extract patterns | :analyze | "Analyze this website" |
+
+### Integration with frontend-design Skill
+
+When used alongside the frontend-design skill:
+1. frontend-design establishes design direction
+2. kui-design suggests patterns matching that aesthetic
+3. Generated code follows both the pattern and design direction
+
+Configure in CLAUDE.md to enable automatic pattern suggestions during frontend-design workflows.
+
+## Quality Assurance
+
+Patterns are validated on extraction and storage:
+- Schema validation ensures correct structure
+- Quality gates score completeness and coherence
+- Issues are logged but don't block storage (advisory)
+
+Quality factors checked:
+- Minimum principles (3+)
+- Minimum tags (2+)
+- Code example length
+- Category-tag coherence
