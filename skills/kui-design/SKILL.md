@@ -23,7 +23,7 @@ This skill activates when the user's request involves:
 ## Available Sub-Commands
 
 - **:generate** — Search patterns and generate framework-specific code
-- **:analyze** — Extract patterns from a website URL (Phase 3)
+- **:analyze** — Extract design patterns from a website URL
 
 ## Pattern Categories
 
@@ -50,3 +50,14 @@ Patterns stored in `.knowledge/patterns/` with:
 - Code examples (the "how")
 - Accessibility notes
 - Framework compatibility
+
+## Pattern Extraction
+
+When using :analyze, the extraction pipeline:
+1. Renders page with Playwright (full JS execution)
+2. Extracts computed CSS styles and stylesheets
+3. Analyzes CSS for animations, layouts, interactions
+4. Analyzes DOM for component structure
+5. Identifies patterns with AI assistance
+6. Saves patterns to `.knowledge/patterns/{category}/`
+7. Generates case study to `.knowledge/case-studies/`

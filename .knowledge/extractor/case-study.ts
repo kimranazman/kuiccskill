@@ -223,7 +223,7 @@ export function generateDesignRationale(patterns: Pattern[], structure: Structur
 
   // When to use these patterns
   lines.push('**When to Use:**');
-  const categories = [...new Set(patterns.map(p => p.category))];
+  const categories = Array.from(new Set(patterns.map(p => p.category)));
   for (const category of categories) {
     const recommendation = getUsageRecommendation(category);
     if (recommendation) {
@@ -260,7 +260,7 @@ function getUsageRecommendation(category: string): string | null {
  */
 export function generateCaseStudy(data: ExtractionData, patterns: Pattern[]): string {
   const siteName = getSiteName(data.url);
-  const categories = [...new Set(patterns.map(p => p.category))];
+  const categories = Array.from(new Set(patterns.map(p => p.category)));
 
   const lines: string[] = [];
 
