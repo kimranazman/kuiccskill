@@ -112,10 +112,14 @@ Plans:
   5. Main skill orchestrates sub-skills with context forking (analyze/generate isolation)
   6. Validation gates prevent degraded patterns from being stored
   7. Pattern quality baseline maintained through automated quality checks
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — In-memory pattern cache (fast indexed search, <100ms lookups)
+- [ ] 05-02-PLAN.md — Quality validation gates (completeness checks, scoring system)
+- [ ] 05-03-PLAN.md — Context-aware suggestion engine (keyword analysis, relevance ranking)
+- [ ] 05-04-PLAN.md — Suggest command (:suggest sub-command with pattern recommendations)
+- [ ] 05-05-PLAN.md — Workflow integration (frontend-design hooks, CLAUDE.md configuration)
 
 ## Progress
 
@@ -128,4 +132,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Code Generation Engine | 5/5 | Complete | 2026-02-02 |
 | 3. Pattern Extraction | 6/6 | Complete | 2026-02-02 |
 | 4. Multi-Framework & Documentation | 5/5 | Complete | 2026-02-02 |
-| 5. Integration & Performance | 0/0 | Not started | - |
+| 5. Integration & Performance | 0/5 | Planned | - |
