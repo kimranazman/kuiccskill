@@ -1,0 +1,37 @@
+/**
+ * {{name}}
+ *
+ * Design Principles:
+{{#each principles}}
+ * - {{this}}
+{{/each}}
+ *
+ * Category: {{category}}
+ * Tags: {{#each tags}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{#if accessibility}}
+ * Accessibility: {{accessibility.notes}}
+{{/if}}
+ */
+
+{{#if code}}
+{{{code}}}
+{{else}}
+import React from 'react';
+
+interface {{pascalName}}Props {
+  // Add props based on pattern requirements
+}
+
+export const {{pascalName}}: React.FC<{{pascalName}}Props> = (props) => {
+  return (
+    <div className="{{slugName}}">
+      {/*
+        Implement based on principles:
+        {{#each principles}}
+        - {{this}}
+        {{/each}}
+      */}
+    </div>
+  );
+};
+{{/if}}

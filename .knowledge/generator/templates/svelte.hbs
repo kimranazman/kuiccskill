@@ -1,0 +1,28 @@
+<!--
+  {{name}}
+
+  Design Principles:
+{{#each principles}}
+  - {{this}}
+{{/each}}
+
+  Category: {{category}}
+-->
+
+{{#if code}}
+{{{code}}}
+{{else}}
+<script lang="ts">
+  // Props based on pattern requirements
+</script>
+
+<div class="{{slugName}}">
+  <!-- Implement based on principles above -->
+</div>
+
+<style>
+  .{{slugName}} {
+    /* Apply principles */
+  }
+</style>
+{{/if}}

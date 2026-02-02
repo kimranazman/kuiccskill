@@ -1,0 +1,26 @@
+/**
+ * {{name}}
+ *
+ * Design Principles:
+{{#each principles}}
+ * - {{this}}
+{{/each}}
+ *
+ * Category: {{category}}
+{{#if accessibility}}
+ * Accessibility: {{accessibility.notes}}
+{{/if}}
+ */
+
+{{#if code}}
+{{{code}}}
+{{else}}
+.{{slugName}} {
+  /*
+   * Implement based on principles:
+{{#each principles}}
+   * - {{this}}
+{{/each}}
+   */
+}
+{{/if}}

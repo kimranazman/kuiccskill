@@ -1,0 +1,41 @@
+<!--
+  {{name}}
+
+  Design Principles:
+{{#each principles}}
+  - {{this}}
+{{/each}}
+
+  Category: {{category}}
+{{#if accessibility}}
+  Accessibility: {{accessibility.notes}}
+{{/if}}
+-->
+
+{{#if code}}
+{{{code}}}
+{{else}}
+<script setup lang="ts">
+// Props based on pattern requirements
+interface Props {
+}
+
+defineProps<Props>();
+</script>
+
+<template>
+  <div class="{{slugName}}">
+    <!-- Implement based on principles above -->
+  </div>
+</template>
+
+<style scoped>
+.{{slugName}} {
+  /* Apply principles:
+{{#each principles}}
+     - {{this}}
+{{/each}}
+  */
+}
+</style>
+{{/if}}
