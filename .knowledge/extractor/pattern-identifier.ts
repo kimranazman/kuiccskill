@@ -9,6 +9,7 @@ import { CATEGORIES, type Category } from '../schema/categories';
 import type { AnimationPattern, LayoutPattern, InteractionPattern } from './css-analyzer';
 import type { ComponentHierarchy, DomComponent, StructureAnalysis } from './dom-analyzer';
 import type { ElementStyles, StylesheetData } from './browser';
+import { validateQuality, type QualityResult } from '../integration/quality-gates';
 
 /**
  * Combined extraction data from all sources.
@@ -206,16 +207,52 @@ export function parsePatternYaml(yamlText: string): unknown | null {
 
 /**
  * Validates a parsed object against the PatternSchema.
+ * Also runs quality validation and logs any issues.
  *
  * @param data - The object to validate
+ * @param options - Validation options
  * @returns Validated Pattern or null
  */
-export function validatePattern(data: unknown): Pattern | null {
+export function validatePattern(
+  data: unknown,
+  options: { logQuality?: boolean } = {}
+): Pattern | null {
+  const { logQuality = true } = options;
+
   const result = PatternSchema.safeParse(data);
-  if (result.success) {
-    return result.data;
+  if (!result.success) {
+    return null;
   }
-  return null;
+
+  const pattern = result.data;
+
+  // Run quality validation (advisory, not blocking)
+  if (logQuality) {
+    const qualityResult = validateQuality(pattern);
+    if (qualityResult.level !== 'passed') {
+      console.log(`\nQuality: ${qualityResult.level} (score: ${qualityResult.score}/100)`);
+      for (const issue of qualityResult.issues) {
+        console.log(`  [${issue.severity}] ${issue.field}: ${issue.message}`);
+        if (issue.suggestion) {
+          console.log(`         └─ ${issue.suggestion}`);
+        }
+      }
+      console.log('');
+    }
+  }
+
+  return pattern;
+}
+
+/**
+ * Run quality validation on a pattern and return the result.
+ * Useful when you need the full quality result, not just the pattern.
+ *
+ * @param pattern - Validated pattern to check quality
+ * @returns Quality validation result
+ */
+export function getPatternQuality(pattern: Pattern): QualityResult {
+  return validateQuality(pattern);
 }
 
 /**
