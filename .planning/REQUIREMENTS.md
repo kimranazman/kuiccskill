@@ -109,12 +109,51 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| STOR-01 | Phase 1 | Pending |
+| STOR-02 | Phase 1 | Pending |
+| STOR-03 | Phase 1 | Pending |
+| STOR-04 | Phase 1 | Pending |
+| STOR-05 | Phase 1 | Pending |
+| STOR-06 | Phase 1 | Pending |
+| GEN-01 | Phase 2 | Pending |
+| GEN-02 | Phase 2 | Pending |
+| GEN-03 | Phase 2 | Pending |
+| GEN-06 | Phase 2 | Pending |
+| GEN-07 | Phase 2 | Pending |
+| GEN-08 | Phase 2 | Pending |
+| GEN-09 | Phase 2 | Pending |
+| INT-02 | Phase 2 | Pending |
+| INT-03 | Phase 2 | Pending |
+| EXTR-01 | Phase 3 | Pending |
+| EXTR-02 | Phase 3 | Pending |
+| EXTR-03 | Phase 3 | Pending |
+| EXTR-04 | Phase 3 | Pending |
+| EXTR-05 | Phase 3 | Pending |
+| EXTR-06 | Phase 3 | Pending |
+| EXTR-07 | Phase 3 | Pending |
+| EXTR-08 | Phase 3 | Pending |
+| EXTR-09 | Phase 3 | Pending |
+| GEN-04 | Phase 4 | Pending |
+| GEN-05 | Phase 4 | Pending |
+| DOC-01 | Phase 4 | Pending |
+| DOC-02 | Phase 4 | Pending |
+| DOC-03 | Phase 4 | Pending |
+| DOC-04 | Phase 4 | Pending |
+| QUAL-03 | Phase 4 | Pending |
+| INT-01 | Phase 5 | Pending |
+| INT-04 | Phase 5 | Pending |
+| INT-05 | Phase 5 | Pending |
+| INT-06 | Phase 5 | Pending |
+| INT-07 | Phase 5 | Pending |
+| INT-08 | Phase 5 | Pending |
+| QUAL-01 | Phase 5 | Pending |
+| QUAL-02 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 45 total
-- Mapped to phases: 0
-- Unmapped: 45 ⚠️
+- v1 requirements: 39 total
+- Mapped to phases: 39
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after initial definition*
+*Last updated: 2026-02-02 after roadmap creation*
