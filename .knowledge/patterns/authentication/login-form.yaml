@@ -22,6 +22,37 @@ principles:
   - Remember me option for convenience
   - Forgot password link prominently placed
   - Loading state on submit to prevent double-clicks
+
+documentation:
+  description: "A complete login form with email and password fields, validation states, and submit handling. Designed for authentication flows with proper accessibility and security considerations including password visibility toggle and loading states."
+  usage: "Use as a standalone login page component or embed in a modal. Connect onSubmit to your authentication handler. The form handles loading states and error display automatically."
+  parameters:
+    - name: onSubmit
+      type: "(credentials: { email: string; password: string; remember?: boolean }) => Promise<void>"
+      description: Async handler for form submission
+      required: true
+    - name: isLoading
+      type: boolean
+      description: Shows loading state during authentication
+      required: false
+      default: "false"
+    - name: error
+      type: string
+      description: Error message to display
+      required: false
+  best_practices:
+    - "Never log or expose password values"
+    - "Use autocomplete attributes for password managers"
+    - "Show clear validation feedback on error"
+    - "Disable submit button while loading to prevent double-clicks"
+    - "Provide password visibility toggle for better UX"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     import { useState, FormEvent } from 'react';
@@ -129,6 +160,190 @@ code_examples:
         </form>
       );
     };
+
+  vue: |
+    <script setup lang="ts">
+    import { ref } from 'vue';
+
+    const emit = defineEmits<{
+      submit: [{ email: string; password: string; remember: boolean }];
+    }>();
+
+    const email = ref('');
+    const password = ref('');
+    const showPassword = ref(false);
+    const remember = ref(false);
+    const loading = ref(false);
+    const error = ref('');
+
+    const handleSubmit = async () => {
+      error.value = '';
+      loading.value = true;
+
+      try {
+        emit('submit', {
+          email: email.value,
+          password: password.value,
+          remember: remember.value,
+        });
+      } catch (err) {
+        error.value = 'Invalid email or password';
+      } finally {
+        loading.value = false;
+      }
+    };
+    </script>
+    <template>
+      <form @submit.prevent="handleSubmit" class="space-y-6 max-w-sm mx-auto">
+        <h1 class="text-2xl font-bold text-center">Sign In</h1>
+
+        <div v-if="error" role="alert" class="p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+          {{ error }}
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium mb-1">Email</label>
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            autocomplete="email"
+            required
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium mb-1">Password</label>
+          <div class="relative">
+            <input
+              id="password"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              autocomplete="current-password"
+              required
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-12"
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <slot name="eye-icon" :show="showPassword" />
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 text-sm">
+            <input v-model="remember" type="checkbox" class="rounded" />
+            Remember me
+          </label>
+          <a href="/forgot-password" class="text-sm text-blue-600 hover:underline">
+            Forgot password?
+          </a>
+        </div>
+
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {{ loading ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </form>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      import { createEventDispatcher } from 'svelte';
+
+      const dispatch = createEventDispatcher();
+
+      let email = '';
+      let password = '';
+      let showPassword = false;
+      let remember = false;
+      let loading = false;
+      let error = '';
+
+      const handleSubmit = async () => {
+        error = '';
+        loading = true;
+
+        try {
+          dispatch('submit', { email, password, remember });
+        } catch (err) {
+          error = 'Invalid email or password';
+        } finally {
+          loading = false;
+        }
+      };
+    </script>
+
+    <form on:submit|preventDefault={handleSubmit} class="space-y-6 max-w-sm mx-auto">
+      <h1 class="text-2xl font-bold text-center">Sign In</h1>
+
+      {#if error}
+        <div role="alert" class="p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+          {error}
+        </div>
+      {/if}
+
+      <div>
+        <label for="email" class="block text-sm font-medium mb-1">Email</label>
+        <input
+          id="email"
+          bind:value={email}
+          type="email"
+          autocomplete="email"
+          required
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium mb-1">Password</label>
+        <div class="relative">
+          <input
+            id="password"
+            bind:value={password}
+            type={showPassword ? 'text' : 'password'}
+            autocomplete="current-password"
+            required
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-12"
+          />
+          <button
+            type="button"
+            on:click={() => (showPassword = !showPassword)}
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            <slot name="eye-icon" show={showPassword} />
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <label class="flex items-center gap-2 text-sm">
+          <input bind:checked={remember} type="checkbox" class="rounded" />
+          Remember me
+        </label>
+        <a href="/forgot-password" class="text-sm text-blue-600 hover:underline">
+          Forgot password?
+        </a>
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        class="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        {loading ? 'Signing in...' : 'Sign In'}
+      </button>
+    </form>
+
   vanilla: >-
     <form class="login-form" id="loginForm">
       <h1 class="login-title">Sign In</h1>
