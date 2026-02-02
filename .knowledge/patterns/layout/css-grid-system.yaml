@@ -22,6 +22,38 @@ principles:
   - Use minmax() for flexible column sizing that respects content
   - Apply gap for consistent spacing instead of margins on children
   - Use fr units for proportional sizing that adapts to container
+
+documentation:
+  description: "A flexible 12-column grid system that provides consistent layout structure across all screen sizes. Uses CSS Grid for precise control over both rows and columns, with responsive gap spacing that adapts from mobile to desktop."
+  usage: "Wrap content in Grid component and use GridItem with span prop to control column width. For complex layouts, nest grids or use grid-template-areas for named regions."
+  parameters:
+    - name: cols
+      type: number
+      description: Number of grid columns (default 12-column system)
+      required: false
+      default: "12"
+    - name: gap
+      type: string
+      description: Gap between grid items (responsive by default)
+      required: false
+      default: "'1rem'"
+    - name: span
+      type: number
+      description: Number of columns an item should span
+      required: false
+      default: "1"
+  best_practices:
+    - "Use the 12-column system for maximum flexibility (divides evenly by 2, 3, 4, 6)"
+    - "Apply gap instead of margins for consistent spacing"
+    - "Use minmax() for columns that need minimum width but can grow"
+    - "Consider mobile-first: start with single column, expand for larger screens"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     const Grid = ({ children, cols = 12 }: { children: React.ReactNode; cols?:
@@ -36,6 +68,40 @@ code_examples:
     React.ReactNode }) => (
       <div className={`col-span-${span}`}>{children}</div>
     );
+
+  vue: |
+    <script setup lang="ts">
+    interface Props {
+      cols?: number;
+      gap?: string;
+    }
+    const props = withDefaults(defineProps<Props>(), {
+      cols: 12,
+      gap: '1rem',
+    });
+    </script>
+    <template>
+      <div
+        class="grid"
+        :style="{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gap }"
+      >
+        <slot />
+      </div>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      export let cols: number = 12;
+      export let gap: string = '1rem';
+    </script>
+    <div
+      class="grid"
+      style:grid-template-columns="repeat({cols}, 1fr)"
+      style:gap={gap}
+    >
+      <slot />
+    </div>
+
   vanilla: |-
     .grid {
       display: grid;

@@ -16,6 +16,38 @@ principles:
   - Use flex-1 to allow items to grow and fill available space
   - "min-height: 100vh for full viewport centering"
   - Consider flex-wrap for responsive layouts without media queries
+
+documentation:
+  description: "Utility components for common centering patterns using Flexbox. Includes perfect center (both axes), horizontal stack, and vertical stack layouts with consistent gap-based spacing."
+  usage: "Use Center for hero sections and modals, HStack for inline elements like buttons and icons, VStack for form layouts and card content."
+  parameters:
+    - name: gap
+      type: number | string
+      description: Spacing between flex children
+      required: false
+      default: "4"
+    - name: align
+      type: string
+      description: Cross-axis alignment (items-start, items-center, items-end)
+      required: false
+      default: "'center'"
+    - name: justify
+      type: string
+      description: Main-axis alignment (justify-start, justify-center, justify-between)
+      required: false
+      default: "'center'"
+  best_practices:
+    - "Use gap instead of margins for consistent spacing"
+    - "Apply flex-wrap for responsive layouts that reflow content"
+    - "Use min-height: 100vh only for full-page centering"
+    - "Combine with flex-1 for equal-width children"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     // Perfect center (both axes)
@@ -41,6 +73,49 @@ code_examples:
     number }) => (
       <div className={`flex flex-col items-center gap-${gap}`}>{children}</div>
     );
+
+  vue: |
+    <script setup lang="ts">
+    interface Props {
+      gap?: number;
+      direction?: 'row' | 'column';
+      align?: 'start' | 'center' | 'end';
+      justify?: 'start' | 'center' | 'end' | 'between';
+    }
+    const props = withDefaults(defineProps<Props>(), {
+      gap: 4,
+      direction: 'row',
+      align: 'center',
+      justify: 'center',
+    });
+    </script>
+    <template>
+      <div
+        class="flex"
+        :class="[
+          `flex-${direction}`,
+          `items-${align}`,
+          `justify-${justify}`,
+          `gap-${gap}`,
+        ]"
+      >
+        <slot />
+      </div>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      export let gap: number = 4;
+      export let direction: 'row' | 'column' = 'row';
+      export let align: 'start' | 'center' | 'end' = 'center';
+      export let justify: 'start' | 'center' | 'end' | 'between' = 'center';
+    </script>
+    <div
+      class="flex flex-{direction} items-{align} justify-{justify} gap-{gap}"
+    >
+      <slot />
+    </div>
+
   vanilla: |-
     .center {
       display: flex;

@@ -21,6 +21,45 @@ principles:
   - Subtle hover states with transform and shadow for interactivity
   - Group related content visually with consistent card structure
   - Maintain readable line lengths within cards (45-75 characters)
+
+documentation:
+  description: "A self-adapting card grid that automatically adjusts column count based on available space. Uses CSS Grid auto-fit with minmax to create fluid layouts without media queries, perfect for product listings and content galleries."
+  usage: "Place Card components inside CardGrid. Cards automatically wrap and resize. Use minWidth prop to control the minimum card width before wrapping."
+  parameters:
+    - name: minWidth
+      type: string
+      description: Minimum card width before wrapping (e.g., '280px')
+      required: false
+      default: "'280px'"
+    - name: gap
+      type: string
+      description: Gap between cards
+      required: false
+      default: "'1.5rem'"
+    - name: image
+      type: string
+      description: Card image URL
+      required: true
+    - name: title
+      type: string
+      description: Card title text
+      required: true
+    - name: description
+      type: string
+      description: Card description text
+      required: false
+  best_practices:
+    - "Use aspect-ratio for consistent image dimensions"
+    - "Keep card descriptions short (2-3 lines max) with line-clamp"
+    - "Add subtle hover effects for interactive cards"
+    - "Ensure focus states are visible for keyboard users"
+
+framework_compatibility:
+  react: "18.0+"
+  vue: "3.0+"
+  svelte: "4.0+"
+  vanilla: true
+
 code_examples:
   react: >-
     interface CardProps {
@@ -56,6 +95,63 @@ code_examples:
         {children}
       </div>
     );
+
+  vue: |
+    <script setup lang="ts">
+    interface Props {
+      image: string;
+      title: string;
+      description?: string;
+    }
+    defineProps<Props>();
+    const emit = defineEmits<{ click: [] }>();
+    </script>
+    <template>
+      <article
+        class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+        @click="emit('click')"
+      >
+        <div class="aspect-[4/3] overflow-hidden">
+          <img
+            :src="image"
+            :alt="title"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+        <div class="p-4">
+          <h3 class="font-semibold text-lg mb-2">{{ title }}</h3>
+          <p v-if="description" class="text-gray-600 text-sm line-clamp-2">{{ description }}</p>
+        </div>
+      </article>
+    </template>
+
+  svelte: |
+    <script lang="ts">
+      import { createEventDispatcher } from 'svelte';
+      export let image: string;
+      export let title: string;
+      export let description: string = '';
+      const dispatch = createEventDispatcher();
+    </script>
+    <article
+      class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+      on:click={() => dispatch('click')}
+    >
+      <div class="aspect-[4/3] overflow-hidden">
+        <img
+          src={image}
+          alt={title}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="font-semibold text-lg mb-2">{title}</h3>
+        {#if description}
+          <p class="text-gray-600 text-sm line-clamp-2">{description}</p>
+        {/if}
+      </div>
+    </article>
+
   vanilla: |-
     .card-grid {
       display: grid;
