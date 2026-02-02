@@ -1,0 +1,280 @@
+name: Animated Hamburger Menu Button
+category: navigation
+tags:
+  - hamburger
+  - menu
+  - mobile
+  - toggle
+  - animation
+source:
+  url: https://kprverse.com
+  extracted: 2026-02-02
+principles:
+  - Use CSS transforms for smooth line-to-X animation
+  - Three-line structure with independent animations
+  - Apply transition delays for staggered effect
+  - Accessible button with aria-expanded state
+  - Touch-friendly hit area (minimum 44x44px)
+accessibility:
+  level: AA
+  notes: Include aria-expanded, aria-label, ensure visible focus state
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A hamburger menu icon that smoothly animates into an X when toggled, commonly used for mobile navigation menus.
+  usage: Use as the trigger for mobile navigation menus or slide-out panels.
+  parameters:
+    - name: isOpen
+      type: boolean
+      default: "false"
+      description: Current open/closed state
+    - name: size
+      type: number
+      default: "24"
+      description: Icon size in pixels
+  best_practices:
+    - Ensure button is at least 44x44px for touch
+    - Provide clear visual state change
+    - Use aria-expanded for accessibility
+    - Keep animation under 300ms
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import styles from './HamburgerButton.module.css';
+
+    interface HamburgerButtonProps {
+      isOpen: boolean;
+      onClick: () => void;
+      size?: number;
+    }
+
+    export function HamburgerButton({
+      isOpen,
+      onClick,
+      size = 24
+    }: HamburgerButtonProps) {
+      return (
+        <button
+          className={`${styles.button} ${isOpen ? styles.open : ''}`}
+          onClick={onClick}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          style={{ '--size': `${size}px` } as React.CSSProperties}
+        >
+          <span className={styles.line} />
+          <span className={styles.line} />
+          <span className={styles.line} />
+        </button>
+      );
+    }
+
+    // HamburgerButton.module.css
+    // .button {
+    //   display: flex;
+    //   flex-direction: column;
+    //   justify-content: center;
+    //   align-items: center;
+    //   gap: calc(var(--size) / 5);
+    //   width: 44px;
+    //   height: 44px;
+    //   padding: 0;
+    //   background: transparent;
+    //   border: none;
+    //   cursor: pointer;
+    // }
+    // .line {
+    //   display: block;
+    //   width: var(--size);
+    //   height: 2px;
+    //   background: currentColor;
+    //   border-radius: 1px;
+    //   transition: transform 0.3s ease, opacity 0.3s ease;
+    // }
+    // .open .line:nth-child(1) {
+    //   transform: translateY(calc(var(--size) / 5 + 2px)) rotate(45deg);
+    // }
+    // .open .line:nth-child(2) {
+    //   opacity: 0;
+    //   transform: scaleX(0);
+    // }
+    // .open .line:nth-child(3) {
+    //   transform: translateY(calc(-1 * (var(--size) / 5 + 2px))) rotate(-45deg);
+    // }
+  vue: |
+    <template>
+      <button
+        :class="['hamburger', { open: isOpen }]"
+        @click="$emit('toggle')"
+        :aria-expanded="isOpen"
+        :aria-label="isOpen ? 'Close menu' : 'Open menu'"
+        :style="{ '--size': `${size}px` }"
+      >
+        <span class="line" />
+        <span class="line" />
+        <span class="line" />
+      </button>
+    </template>
+
+    <script setup lang="ts">
+    withDefaults(defineProps<{
+      isOpen: boolean;
+      size?: number;
+    }>(), { size: 24 });
+
+    defineEmits(['toggle']);
+    </script>
+
+    <style scoped>
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: calc(var(--size) / 5);
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .line {
+      display: block;
+      width: var(--size);
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .open .line:nth-child(1) {
+      transform: translateY(calc(var(--size) / 5 + 2px)) rotate(45deg);
+    }
+    .open .line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .open .line:nth-child(3) {
+      transform: translateY(calc(-1 * (var(--size) / 5 + 2px))) rotate(-45deg);
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { createEventDispatcher } from 'svelte';
+
+      export let isOpen = false;
+      export let size = 24;
+
+      const dispatch = createEventDispatcher();
+    </script>
+
+    <button
+      class="hamburger"
+      class:open={isOpen}
+      on:click={() => dispatch('toggle')}
+      aria-expanded={isOpen}
+      aria-label={isOpen ? 'Close menu' : 'Open menu'}
+      style="--size: {size}px"
+    >
+      <span class="line"></span>
+      <span class="line"></span>
+      <span class="line"></span>
+    </button>
+
+    <style>
+      .hamburger {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: calc(var(--size) / 5);
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+      .line {
+        display: block;
+        width: var(--size);
+        height: 2px;
+        background: currentColor;
+        border-radius: 1px;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+      }
+      .open .line:nth-child(1) {
+        transform: translateY(calc(var(--size) / 5 + 2px)) rotate(45deg);
+      }
+      .open .line:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      .open .line:nth-child(3) {
+        transform: translateY(calc(-1 * (var(--size) / 5 + 2px))) rotate(-45deg);
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <button class="hamburger" aria-expanded="false" aria-label="Open menu" data-hamburger>
+      <span class="hamburger__line"></span>
+      <span class="hamburger__line"></span>
+      <span class="hamburger__line"></span>
+    </button>
+
+    /* CSS */
+    .hamburger {
+      --size: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: calc(var(--size) / 5);
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .hamburger__line {
+      display: block;
+      width: var(--size);
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .hamburger.open .hamburger__line:nth-child(1) {
+      transform: translateY(calc(var(--size) / 5 + 2px)) rotate(45deg);
+    }
+
+    .hamburger.open .hamburger__line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .hamburger.open .hamburger__line:nth-child(3) {
+      transform: translateY(calc(-1 * (var(--size) / 5 + 2px))) rotate(-45deg);
+    }
+
+    /* JavaScript */
+    function initHamburger() {
+      document.querySelectorAll('[data-hamburger]').forEach(button => {
+        button.addEventListener('click', () => {
+          const isOpen = button.classList.toggle('open');
+          button.setAttribute('aria-expanded', isOpen);
+          button.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initHamburger);

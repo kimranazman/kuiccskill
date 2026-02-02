@@ -1,0 +1,210 @@
+name: Masonry Grid Layout
+category: layout
+tags:
+  - masonry
+  - grid
+  - gallery
+  - pinterest
+  - responsive
+source:
+  url: https://mindmarket.com
+  extracted: 2026-02-02
+principles:
+  - Use CSS columns for simple masonry without JavaScript
+  - Apply break-inside avoid to prevent item splitting
+  - Use CSS Grid with grid-auto-rows for more control
+  - Ensure responsive column counts across breakpoints
+  - Consider lazy loading for image-heavy implementations
+accessibility:
+  level: AA
+  notes: Ensure logical reading order, provide alt text for images
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A Pinterest-style masonry grid where items of varying heights stack efficiently without leaving gaps.
+  usage: Use for image galleries, card layouts, or any content with varying heights that should display in a compact grid.
+  parameters:
+    - name: columns
+      type: number
+      default: "3"
+      description: Number of columns on desktop
+    - name: gap
+      type: string
+      default: "1rem"
+      description: Gap between items
+  best_practices:
+    - Use CSS columns for simple implementations
+    - Consider JS-based solutions for complex reordering
+    - Lazy load images below the fold
+    - Test with varying content heights
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import styles from './Masonry.module.css';
+
+    interface MasonryProps {
+      children: React.ReactNode;
+      columns?: number;
+      gap?: string;
+    }
+
+    export function Masonry({
+      children,
+      columns = 3,
+      gap = '1rem'
+    }: MasonryProps) {
+      return (
+        <div
+          className={styles.masonry}
+          style={{
+            '--columns': columns,
+            '--gap': gap
+          } as React.CSSProperties}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    export function MasonryItem({ children }: { children: React.ReactNode }) {
+      return <div className={styles.item}>{children}</div>;
+    }
+
+    // Masonry.module.css
+    // .masonry {
+    //   column-count: var(--columns);
+    //   column-gap: var(--gap);
+    // }
+    // .item {
+    //   break-inside: avoid;
+    //   margin-bottom: var(--gap);
+    // }
+    // @media (max-width: 1024px) {
+    //   .masonry { column-count: 2; }
+    // }
+    // @media (max-width: 640px) {
+    //   .masonry { column-count: 1; }
+    // }
+  vue: |
+    <template>
+      <div
+        class="masonry"
+        :style="{ '--columns': columns, '--gap': gap }"
+      >
+        <slot />
+      </div>
+    </template>
+
+    <script setup lang="ts">
+    withDefaults(defineProps<{
+      columns?: number;
+      gap?: string;
+    }>(), {
+      columns: 3,
+      gap: '1rem'
+    });
+    </script>
+
+    <style scoped>
+    .masonry {
+      column-count: var(--columns);
+      column-gap: var(--gap);
+    }
+    .masonry > :deep(*) {
+      break-inside: avoid;
+      margin-bottom: var(--gap);
+    }
+    @media (max-width: 1024px) {
+      .masonry { column-count: 2; }
+    }
+    @media (max-width: 640px) {
+      .masonry { column-count: 1; }
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      export let columns = 3;
+      export let gap = '1rem';
+    </script>
+
+    <div class="masonry" style="--columns: {columns}; --gap: {gap}">
+      <slot />
+    </div>
+
+    <style>
+      .masonry {
+        column-count: var(--columns);
+        column-gap: var(--gap);
+      }
+      .masonry > :global(*) {
+        break-inside: avoid;
+        margin-bottom: var(--gap);
+      }
+      @media (max-width: 1024px) {
+        .masonry { column-count: 2; }
+      }
+      @media (max-width: 640px) {
+        .masonry { column-count: 1; }
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <div class="masonry">
+      <div class="masonry__item">
+        <img src="image1.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="masonry__item">
+        <img src="image2.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="masonry__item">
+        <img src="image3.jpg" alt="" loading="lazy" />
+      </div>
+      <!-- More items... -->
+    </div>
+
+    /* CSS */
+    .masonry {
+      --columns: 3;
+      --gap: 1rem;
+      column-count: var(--columns);
+      column-gap: var(--gap);
+    }
+
+    .masonry__item {
+      break-inside: avoid;
+      margin-bottom: var(--gap);
+    }
+
+    .masonry__item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 1024px) {
+      .masonry {
+        --columns: 2;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .masonry {
+        --columns: 1;
+      }
+    }
+
+    /* Optional: Card styling for items */
+    .masonry__item--card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }

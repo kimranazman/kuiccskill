@@ -1,0 +1,440 @@
+name: Full-Screen Hero Section
+category: layout
+tags:
+  - hero
+  - landing
+  - fullscreen
+  - header
+  - responsive
+source:
+  url: https://opalcamera.com
+  extracted: 2026-02-02
+principles:
+  - Use 100vh or 100svh for full viewport height
+  - Layer content over background image/video
+  - Center content vertically and horizontally
+  - Apply gradient overlay for text readability
+  - Make responsive with mobile-first approach
+accessibility:
+  level: AA
+  notes: Ensure text contrast over backgrounds, provide alt text for images
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A full-viewport hero section with background media, gradient overlay, and centered content - commonly the first thing visitors see on landing pages.
+  usage: Use as the primary above-the-fold section on landing pages, product pages, or marketing sites.
+  parameters:
+    - name: minHeight
+      type: string
+      default: "100vh"
+      description: Minimum section height
+    - name: overlayOpacity
+      type: number
+      default: "0.4"
+      description: Background overlay opacity
+  best_practices:
+    - Use 100svh for mobile-safe viewport height
+    - Optimize background images for web
+    - Ensure CTA buttons are visible and accessible
+    - Test text readability across different backgrounds
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import styles from './Hero.module.css';
+
+    interface HeroProps {
+      title: string;
+      subtitle?: string;
+      backgroundImage?: string;
+      backgroundVideo?: string;
+      ctaText?: string;
+      ctaHref?: string;
+      overlayOpacity?: number;
+    }
+
+    export function Hero({
+      title,
+      subtitle,
+      backgroundImage,
+      backgroundVideo,
+      ctaText,
+      ctaHref,
+      overlayOpacity = 0.4
+    }: HeroProps) {
+      return (
+        <section className={styles.hero}>
+          {backgroundVideo ? (
+            <video
+              className={styles.background}
+              src={backgroundVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : backgroundImage ? (
+            <img
+              className={styles.background}
+              src={backgroundImage}
+              alt=""
+              loading="eager"
+            />
+          ) : null}
+          <div
+            className={styles.overlay}
+            style={{ '--opacity': overlayOpacity } as React.CSSProperties}
+          />
+          <div className={styles.content}>
+            <h1 className={styles.title}>{title}</h1>
+            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+            {ctaText && ctaHref && (
+              <a href={ctaHref} className={styles.cta}>
+                {ctaText}
+              </a>
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    // Hero.module.css
+    // .hero {
+    //   position: relative;
+    //   min-height: 100vh;
+    //   min-height: 100svh;
+    //   display: flex;
+    //   align-items: center;
+    //   justify-content: center;
+    //   overflow: hidden;
+    // }
+    // .background {
+    //   position: absolute;
+    //   inset: 0;
+    //   width: 100%;
+    //   height: 100%;
+    //   object-fit: cover;
+    //   z-index: 0;
+    // }
+    // .overlay {
+    //   position: absolute;
+    //   inset: 0;
+    //   background: linear-gradient(to bottom, rgba(0,0,0,var(--opacity)), rgba(0,0,0,calc(var(--opacity) + 0.2)));
+    //   z-index: 1;
+    // }
+    // .content {
+    //   position: relative;
+    //   z-index: 2;
+    //   text-align: center;
+    //   color: #fff;
+    //   padding: 2rem;
+    //   max-width: 800px;
+    // }
+    // .title {
+    //   font-size: clamp(2rem, 5vw, 4rem);
+    //   margin: 0 0 1rem;
+    //   font-weight: 700;
+    // }
+    // .subtitle {
+    //   font-size: clamp(1rem, 2vw, 1.25rem);
+    //   margin: 0 0 2rem;
+    //   opacity: 0.9;
+    // }
+    // .cta {
+    //   display: inline-block;
+    //   padding: 1rem 2rem;
+    //   background: #fff;
+    //   color: #000;
+    //   text-decoration: none;
+    //   font-weight: 600;
+    //   border-radius: 4px;
+    //   transition: transform 0.2s, box-shadow 0.2s;
+    // }
+    // .cta:hover {
+    //   transform: translateY(-2px);
+    //   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    // }
+  vue: |
+    <template>
+      <section class="hero">
+        <video
+          v-if="backgroundVideo"
+          class="background"
+          :src="backgroundVideo"
+          autoplay
+          muted
+          loop
+          playsinline
+        />
+        <img
+          v-else-if="backgroundImage"
+          class="background"
+          :src="backgroundImage"
+          alt=""
+          loading="eager"
+        />
+        <div class="overlay" :style="{ '--opacity': overlayOpacity }" />
+        <div class="content">
+          <h1 class="title">{{ title }}</h1>
+          <p v-if="subtitle" class="subtitle">{{ subtitle }}</p>
+          <a v-if="ctaText && ctaHref" :href="ctaHref" class="cta">
+            {{ ctaText }}
+          </a>
+        </div>
+      </section>
+    </template>
+
+    <script setup lang="ts">
+    withDefaults(defineProps<{
+      title: string;
+      subtitle?: string;
+      backgroundImage?: string;
+      backgroundVideo?: string;
+      ctaText?: string;
+      ctaHref?: string;
+      overlayOpacity?: number;
+    }>(), {
+      overlayOpacity: 0.4
+    });
+    </script>
+
+    <style scoped>
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,var(--opacity)), rgba(0,0,0,calc(var(--opacity) + 0.2)));
+      z-index: 1;
+    }
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: #fff;
+      padding: 2rem;
+      max-width: 800px;
+    }
+    .title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      margin: 0 0 1rem;
+      font-weight: 700;
+    }
+    .subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      margin: 0 0 2rem;
+      opacity: 0.9;
+    }
+    .cta {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      export let title: string;
+      export let subtitle = '';
+      export let backgroundImage = '';
+      export let backgroundVideo = '';
+      export let ctaText = '';
+      export let ctaHref = '';
+      export let overlayOpacity = 0.4;
+    </script>
+
+    <section class="hero">
+      {#if backgroundVideo}
+        <video
+          class="background"
+          src={backgroundVideo}
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+      {:else if backgroundImage}
+        <img
+          class="background"
+          src={backgroundImage}
+          alt=""
+          loading="eager"
+        />
+      {/if}
+      <div class="overlay" style="--opacity: {overlayOpacity}"></div>
+      <div class="content">
+        <h1 class="title">{title}</h1>
+        {#if subtitle}
+          <p class="subtitle">{subtitle}</p>
+        {/if}
+        {#if ctaText && ctaHref}
+          <a href={ctaHref} class="cta">{ctaText}</a>
+        {/if}
+      </div>
+    </section>
+
+    <style>
+      .hero {
+        position: relative;
+        min-height: 100vh;
+        min-height: 100svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .background {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+      }
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,var(--opacity)), rgba(0,0,0,calc(var(--opacity) + 0.2)));
+        z-index: 1;
+      }
+      .content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: #fff;
+        padding: 2rem;
+        max-width: 800px;
+      }
+      .title {
+        font-size: clamp(2rem, 5vw, 4rem);
+        margin: 0 0 1rem;
+        font-weight: 700;
+      }
+      .subtitle {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        margin: 0 0 2rem;
+        opacity: 0.9;
+      }
+      .cta {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: #fff;
+        color: #000;
+        text-decoration: none;
+        font-weight: 600;
+        border-radius: 4px;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <section class="hero">
+      <img class="hero__background" src="hero-bg.jpg" alt="" loading="eager" />
+      <div class="hero__overlay"></div>
+      <div class="hero__content">
+        <h1 class="hero__title">Welcome to Our Site</h1>
+        <p class="hero__subtitle">Discover amazing products and services</p>
+        <a href="/shop" class="hero__cta">Get Started</a>
+      </div>
+    </section>
+
+    /* CSS */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero__background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.4),
+        rgba(0, 0, 0, 0.6)
+      );
+      z-index: 1;
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: #fff;
+      padding: 2rem;
+      max-width: 800px;
+    }
+
+    .hero__title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      margin: 0 0 1rem;
+      font-weight: 700;
+    }
+
+    .hero__subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      margin: 0 0 2rem;
+      opacity: 0.9;
+    }
+
+    .hero__cta {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .hero__cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
