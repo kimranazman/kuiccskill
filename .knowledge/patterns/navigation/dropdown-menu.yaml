@@ -1,0 +1,475 @@
+name: Animated Dropdown Menu
+category: navigation
+tags:
+  - dropdown
+  - menu
+  - navigation
+  - hover
+  - animation
+source:
+  url: https://mindmarket.com
+  extracted: 2026-02-02
+principles:
+  - Use CSS transform and opacity for smooth reveal animation
+  - Apply staggered delays to child items using CSS custom properties
+  - Handle both hover and click interactions for accessibility
+  - Use pointer-events to prevent interaction during animation
+  - Position with absolute to avoid layout shifts
+accessibility:
+  level: AA
+  notes: Include proper ARIA attributes, keyboard navigation, and focus management
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A dropdown menu that reveals items with staggered animation, triggered by hover or click with proper accessibility support.
+  usage: Use for navigation menus, settings dropdowns, or any expandable list of options.
+  parameters:
+    - name: trigger
+      type: string
+      default: "hover"
+      description: Trigger mode (hover or click)
+    - name: staggerDelay
+      type: number
+      default: "50"
+      description: Delay between each item animation in ms
+  best_practices:
+    - Ensure dropdown closes on outside click
+    - Support keyboard navigation (arrows, escape)
+    - Use appropriate ARIA roles and states
+    - Position intelligently to stay in viewport
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import { useState, useRef, useEffect } from 'react';
+    import styles from './Dropdown.module.css';
+
+    interface DropdownItem {
+      label: string;
+      href?: string;
+      onClick?: () => void;
+    }
+
+    interface DropdownProps {
+      trigger: React.ReactNode;
+      items: DropdownItem[];
+      triggerMode?: 'hover' | 'click';
+    }
+
+    export function Dropdown({ trigger, items, triggerMode = 'hover' }: DropdownProps) {
+      const [isOpen, setIsOpen] = useState(false);
+      const containerRef = useRef<HTMLDivElement>(null);
+
+      useEffect(() => {
+        if (triggerMode !== 'click') return;
+
+        const handleClickOutside = (e: MouseEvent) => {
+          if (!containerRef.current?.contains(e.target as Node)) {
+            setIsOpen(false);
+          }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+      }, [triggerMode]);
+
+      const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Escape') setIsOpen(false);
+      };
+
+      return (
+        <div
+          ref={containerRef}
+          className={styles.dropdown}
+          onMouseEnter={triggerMode === 'hover' ? () => setIsOpen(true) : undefined}
+          onMouseLeave={triggerMode === 'hover' ? () => setIsOpen(false) : undefined}
+          onKeyDown={handleKeyDown}
+        >
+          <button
+            className={styles.trigger}
+            onClick={triggerMode === 'click' ? () => setIsOpen(!isOpen) : undefined}
+            aria-expanded={isOpen}
+            aria-haspopup="menu"
+          >
+            {trigger}
+          </button>
+          <ul
+            className={`${styles.menu} ${isOpen ? styles.open : ''}`}
+            role="menu"
+          >
+            {items.map((item, index) => (
+              <li
+                key={index}
+                className={styles.item}
+                style={{ '--index': index } as React.CSSProperties}
+                role="menuitem"
+              >
+                {item.href ? (
+                  <a href={item.href}>{item.label}</a>
+                ) : (
+                  <button onClick={item.onClick}>{item.label}</button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    // Dropdown.module.css
+    // .dropdown { position: relative; display: inline-block; }
+    // .trigger { cursor: pointer; }
+    // .menu {
+    //   position: absolute;
+    //   top: 100%;
+    //   left: 0;
+    //   min-width: 180px;
+    //   padding: 0.5rem 0;
+    //   background: #fff;
+    //   border-radius: 8px;
+    //   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    //   list-style: none;
+    //   opacity: 0;
+    //   visibility: hidden;
+    //   transform: translateY(-10px);
+    //   transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    // }
+    // .menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    // .item {
+    //   opacity: 0;
+    //   transform: translateY(-10px);
+    //   transition: opacity 0.2s ease, transform 0.2s ease;
+    //   transition-delay: calc(var(--index) * 50ms);
+    // }
+    // .menu.open .item { opacity: 1; transform: translateY(0); }
+    // .item a, .item button {
+    //   display: block;
+    //   padding: 0.5rem 1rem;
+    //   color: inherit;
+    //   text-decoration: none;
+    //   background: none;
+    //   border: none;
+    //   width: 100%;
+    //   text-align: left;
+    //   cursor: pointer;
+    // }
+    // .item a:hover, .item button:hover { background: #f5f5f5; }
+  vue: |
+    <template>
+      <div
+        ref="container"
+        class="dropdown"
+        @mouseenter="triggerMode === 'hover' && (isOpen = true)"
+        @mouseleave="triggerMode === 'hover' && (isOpen = false)"
+        @keydown.escape="isOpen = false"
+      >
+        <button
+          class="trigger"
+          @click="triggerMode === 'click' && (isOpen = !isOpen)"
+          :aria-expanded="isOpen"
+          aria-haspopup="menu"
+        >
+          <slot name="trigger">Menu</slot>
+        </button>
+        <ul :class="['menu', { open: isOpen }]" role="menu">
+          <li
+            v-for="(item, index) in items"
+            :key="index"
+            class="item"
+            :style="{ '--index': index }"
+            role="menuitem"
+          >
+            <a v-if="item.href" :href="item.href">{{ item.label }}</a>
+            <button v-else @click="item.onClick">{{ item.label }}</button>
+          </li>
+        </ul>
+      </div>
+    </template>
+
+    <script setup lang="ts">
+    import { ref, onMounted, onUnmounted } from 'vue';
+
+    interface DropdownItem {
+      label: string;
+      href?: string;
+      onClick?: () => void;
+    }
+
+    const props = withDefaults(defineProps<{
+      items: DropdownItem[];
+      triggerMode?: 'hover' | 'click';
+    }>(), {
+      triggerMode: 'hover'
+    });
+
+    const isOpen = ref(false);
+    const container = ref<HTMLElement>();
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (props.triggerMode === 'click' && !container.value?.contains(e.target as Node)) {
+        isOpen.value = false;
+      }
+    };
+
+    onMounted(() => document.addEventListener('click', handleClickOutside));
+    onUnmounted(() => document.removeEventListener('click', handleClickOutside));
+    </script>
+
+    <style scoped>
+    .dropdown { position: relative; display: inline-block; }
+    .trigger { cursor: pointer; background: none; border: none; }
+    .menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 180px;
+      padding: 0.5rem 0;
+      margin: 0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      list-style: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    }
+    .menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .item {
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition-delay: calc(var(--index) * 50ms);
+    }
+    .menu.open .item { opacity: 1; transform: translateY(0); }
+    .item a, .item button {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: inherit;
+      text-decoration: none;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+    .item a:hover, .item button:hover { background: #f5f5f5; }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { onMount, onDestroy } from 'svelte';
+
+      interface DropdownItem {
+        label: string;
+        href?: string;
+        onClick?: () => void;
+      }
+
+      export let items: DropdownItem[] = [];
+      export let triggerMode: 'hover' | 'click' = 'hover';
+
+      let isOpen = false;
+      let container: HTMLElement;
+
+      function handleClickOutside(e: MouseEvent) {
+        if (triggerMode === 'click' && !container?.contains(e.target as Node)) {
+          isOpen = false;
+        }
+      }
+
+      onMount(() => document.addEventListener('click', handleClickOutside));
+      onDestroy(() => document.removeEventListener('click', handleClickOutside));
+    </script>
+
+    <div
+      bind:this={container}
+      class="dropdown"
+      on:mouseenter={() => triggerMode === 'hover' && (isOpen = true)}
+      on:mouseleave={() => triggerMode === 'hover' && (isOpen = false)}
+      on:keydown={(e) => e.key === 'Escape' && (isOpen = false)}
+    >
+      <button
+        class="trigger"
+        on:click={() => triggerMode === 'click' && (isOpen = !isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+      >
+        <slot name="trigger">Menu</slot>
+      </button>
+      <ul class="menu" class:open={isOpen} role="menu">
+        {#each items as item, index}
+          <li class="item" style="--index: {index}" role="menuitem">
+            {#if item.href}
+              <a href={item.href}>{item.label}</a>
+            {:else}
+              <button on:click={item.onClick}>{item.label}</button>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </div>
+
+    <style>
+      .dropdown { position: relative; display: inline-block; }
+      .trigger { cursor: pointer; background: none; border: none; }
+      .menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 180px;
+        padding: 0.5rem 0;
+        margin: 0;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        list-style: none;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+      }
+      .menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+      .item {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        transition-delay: calc(var(--index) * 50ms);
+      }
+      .menu.open .item { opacity: 1; transform: translateY(0); }
+      .item a, .item button {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: inherit;
+        text-decoration: none;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+      }
+      .item a:hover, .item button:hover { background: #f5f5f5; }
+    </style>
+  vanilla: |
+    /* HTML */
+    <div class="dropdown" data-dropdown data-trigger="hover">
+      <button class="dropdown__trigger" aria-expanded="false" aria-haspopup="menu">
+        Menu
+        <svg width="12" height="12" viewBox="0 0 12 12">
+          <path d="M3 5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </button>
+      <ul class="dropdown__menu" role="menu">
+        <li class="dropdown__item" role="menuitem"><a href="/about">About</a></li>
+        <li class="dropdown__item" role="menuitem"><a href="/services">Services</a></li>
+        <li class="dropdown__item" role="menuitem"><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+
+    /* CSS */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown__trigger {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font: inherit;
+    }
+
+    .dropdown__menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 180px;
+      padding: 0.5rem 0;
+      margin: 0.5rem 0 0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      list-style: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    }
+
+    .dropdown.open .dropdown__menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown__item {
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .dropdown.open .dropdown__item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .dropdown__item a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .dropdown__item a:hover {
+      background: #f5f5f5;
+    }
+
+    /* JavaScript */
+    function initDropdowns() {
+      document.querySelectorAll('[data-dropdown]').forEach((dropdown, i) => {
+        const trigger = dropdown.querySelector('.dropdown__trigger');
+        const items = dropdown.querySelectorAll('.dropdown__item');
+        const mode = dropdown.dataset.trigger || 'hover';
+
+        // Set stagger delays
+        items.forEach((item, index) => {
+          item.style.transitionDelay = `${index * 50}ms`;
+        });
+
+        const open = () => {
+          dropdown.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+        };
+
+        const close = () => {
+          dropdown.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        };
+
+        if (mode === 'hover') {
+          dropdown.addEventListener('mouseenter', open);
+          dropdown.addEventListener('mouseleave', close);
+        } else {
+          trigger.addEventListener('click', () => {
+            dropdown.classList.contains('open') ? close() : open();
+          });
+          document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) close();
+          });
+        }
+
+        dropdown.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') close();
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initDropdowns);

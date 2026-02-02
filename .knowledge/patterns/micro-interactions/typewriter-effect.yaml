@@ -1,0 +1,367 @@
+name: Typewriter Text Effect
+category: micro-interactions
+tags:
+  - typewriter
+  - typing
+  - animation
+  - text
+  - terminal
+source:
+  url: https://kprverse.com
+  extracted: 2026-02-02
+principles:
+  - Use CSS animation with steps() for discrete character reveal
+  - Combine with blinking cursor for authentic terminal feel
+  - Control timing with animation-duration based on text length
+  - Use monospace font for consistent character width
+  - Provide completed state for accessibility
+accessibility:
+  level: AA
+  notes: Include full text in aria-label for screen readers, respect reduced motion
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: Text that appears to be typed out character by character, creating an engaging typewriter or terminal effect.
+  usage: Use for hero text, command-line interfaces, or anywhere you want to draw attention to text content with dramatic reveal.
+  parameters:
+    - name: text
+      type: string
+      default: ""
+      description: The text to animate
+    - name: speed
+      type: number
+      default: "50"
+      description: Milliseconds per character
+    - name: showCursor
+      type: boolean
+      default: "true"
+      description: Show blinking cursor at end
+  best_practices:
+    - Keep text short for best effect (under 50 chars)
+    - Use monospace fonts for consistent timing
+    - Provide skip option for long animations
+    - Disable animation for prefers-reduced-motion
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import { useState, useEffect } from 'react';
+    import styles from './Typewriter.module.css';
+
+    interface TypewriterProps {
+      text: string;
+      speed?: number;
+      showCursor?: boolean;
+      onComplete?: () => void;
+    }
+
+    export function Typewriter({
+      text,
+      speed = 50,
+      showCursor = true,
+      onComplete
+    }: TypewriterProps) {
+      const [displayText, setDisplayText] = useState('');
+      const [isComplete, setIsComplete] = useState(false);
+
+      useEffect(() => {
+        const prefersReducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReducedMotion) {
+          setDisplayText(text);
+          setIsComplete(true);
+          onComplete?.();
+          return;
+        }
+
+        let index = 0;
+        setDisplayText('');
+        setIsComplete(false);
+
+        const timer = setInterval(() => {
+          if (index < text.length) {
+            setDisplayText(text.slice(0, index + 1));
+            index++;
+          } else {
+            clearInterval(timer);
+            setIsComplete(true);
+            onComplete?.();
+          }
+        }, speed);
+
+        return () => clearInterval(timer);
+      }, [text, speed, onComplete]);
+
+      return (
+        <span className={styles.typewriter} aria-label={text}>
+          <span aria-hidden="true">{displayText}</span>
+          {showCursor && (
+            <span
+              className={`${styles.cursor} ${isComplete ? styles.blink : ''}`}
+              aria-hidden="true"
+            />
+          )}
+        </span>
+      );
+    }
+
+    // Typewriter.module.css
+    // .typewriter {
+    //   font-family: monospace;
+    //   display: inline-flex;
+    //   align-items: center;
+    // }
+    // .cursor {
+    //   display: inline-block;
+    //   width: 0.6em;
+    //   height: 1.1em;
+    //   background: currentColor;
+    //   margin-left: 2px;
+    // }
+    // .blink {
+    //   animation: blink 1s steps(2) infinite;
+    // }
+    // @keyframes blink {
+    //   0% { opacity: 1; }
+    //   50% { opacity: 0; }
+    // }
+  vue: |
+    <template>
+      <span class="typewriter" :aria-label="text">
+        <span aria-hidden="true">{{ displayText }}</span>
+        <span
+          v-if="showCursor"
+          :class="['cursor', { blink: isComplete }]"
+          aria-hidden="true"
+        />
+      </span>
+    </template>
+
+    <script setup lang="ts">
+    import { ref, watch, onUnmounted } from 'vue';
+
+    const props = withDefaults(defineProps<{
+      text: string;
+      speed?: number;
+      showCursor?: boolean;
+    }>(), {
+      speed: 50,
+      showCursor: true
+    });
+
+    const emit = defineEmits(['complete']);
+
+    const displayText = ref('');
+    const isComplete = ref(false);
+    let timer: number | undefined;
+
+    watch(() => props.text, (newText) => {
+      clearInterval(timer);
+
+      const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+
+      if (prefersReducedMotion) {
+        displayText.value = newText;
+        isComplete.value = true;
+        emit('complete');
+        return;
+      }
+
+      let index = 0;
+      displayText.value = '';
+      isComplete.value = false;
+
+      timer = setInterval(() => {
+        if (index < newText.length) {
+          displayText.value = newText.slice(0, index + 1);
+          index++;
+        } else {
+          clearInterval(timer);
+          isComplete.value = true;
+          emit('complete');
+        }
+      }, props.speed);
+    }, { immediate: true });
+
+    onUnmounted(() => clearInterval(timer));
+    </script>
+
+    <style scoped>
+    .typewriter {
+      font-family: monospace;
+      display: inline-flex;
+      align-items: center;
+    }
+    .cursor {
+      display: inline-block;
+      width: 0.6em;
+      height: 1.1em;
+      background: currentColor;
+      margin-left: 2px;
+    }
+    .blink {
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+
+      export let text = '';
+      export let speed = 50;
+      export let showCursor = true;
+
+      const dispatch = createEventDispatcher();
+
+      let displayText = '';
+      let isComplete = false;
+      let timer: number;
+
+      function startTyping() {
+        clearInterval(timer);
+
+        const prefersReducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReducedMotion) {
+          displayText = text;
+          isComplete = true;
+          dispatch('complete');
+          return;
+        }
+
+        let index = 0;
+        displayText = '';
+        isComplete = false;
+
+        timer = setInterval(() => {
+          if (index < text.length) {
+            displayText = text.slice(0, index + 1);
+            index++;
+          } else {
+            clearInterval(timer);
+            isComplete = true;
+            dispatch('complete');
+          }
+        }, speed);
+      }
+
+      $: text, startTyping();
+
+      onDestroy(() => clearInterval(timer));
+    </script>
+
+    <span class="typewriter" aria-label={text}>
+      <span aria-hidden="true">{displayText}</span>
+      {#if showCursor}
+        <span
+          class="cursor"
+          class:blink={isComplete}
+          aria-hidden="true"
+        />
+      {/if}
+    </span>
+
+    <style>
+      .typewriter {
+        font-family: monospace;
+        display: inline-flex;
+        align-items: center;
+      }
+      .cursor {
+        display: inline-block;
+        width: 0.6em;
+        height: 1.1em;
+        background: currentColor;
+        margin-left: 2px;
+      }
+      .blink {
+        animation: blink 1s steps(2) infinite;
+      }
+      @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <span class="typewriter" aria-label="Hello, World!" data-typewriter data-text="Hello, World!">
+      <span class="typewriter__text" aria-hidden="true"></span>
+      <span class="typewriter__cursor" aria-hidden="true"></span>
+    </span>
+
+    /* CSS */
+    .typewriter {
+      font-family: monospace;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .typewriter__cursor {
+      display: inline-block;
+      width: 0.6em;
+      height: 1.1em;
+      background: currentColor;
+      margin-left: 2px;
+    }
+
+    .typewriter__cursor.blink {
+      animation: typewriter-blink 1s steps(2) infinite;
+    }
+
+    @keyframes typewriter-blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .typewriter__cursor {
+        animation: none;
+      }
+    }
+
+    /* JavaScript */
+    function initTypewriter(element, speed = 50) {
+      const text = element.dataset.text || '';
+      const textEl = element.querySelector('.typewriter__text');
+      const cursorEl = element.querySelector('.typewriter__cursor');
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        textEl.textContent = text;
+        cursorEl?.classList.add('blink');
+        return;
+      }
+
+      let index = 0;
+      textEl.textContent = '';
+
+      const timer = setInterval(() => {
+        if (index < text.length) {
+          textEl.textContent = text.slice(0, index + 1);
+          index++;
+        } else {
+          clearInterval(timer);
+          cursorEl?.classList.add('blink');
+          element.dispatchEvent(new CustomEvent('complete'));
+        }
+      }, speed);
+    }
+
+    document.querySelectorAll('[data-typewriter]').forEach(el => {
+      initTypewriter(el);
+    });

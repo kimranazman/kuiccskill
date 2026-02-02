@@ -1,0 +1,489 @@
+name: Scrolling Timeline Layout
+category: layout
+tags:
+  - timeline
+  - scroll
+  - history
+  - vertical
+  - progress
+source:
+  url: https://mindmarket.com
+  extracted: 2026-02-02
+principles:
+  - Use vertical line as visual connector between events
+  - Alternate items left/right for visual interest on desktop
+  - Stack vertically on mobile for readability
+  - Animate items on scroll entry for engagement
+  - Show progress indicator for current scroll position
+accessibility:
+  level: AA
+  notes: Use semantic list markup, ensure sufficient color contrast for timeline line
+frameworks:
+  - react
+  - vue
+  - svelte
+  - vanilla
+documentation:
+  description: A vertical timeline layout where events appear as the user scrolls, with alternating left-right positioning and a connecting line.
+  usage: Use for company history, project milestones, process steps, or any chronological content.
+  parameters:
+    - name: alternating
+      type: boolean
+      default: "true"
+      description: Alternate items left and right on desktop
+    - name: animateOnScroll
+      type: boolean
+      default: "true"
+      description: Animate items when they enter viewport
+  best_practices:
+    - Keep timeline items concise
+    - Use consistent date formatting
+    - Provide clear visual distinction between past and future
+    - Test on mobile where layout simplifies
+framework_compatibility:
+  react: "18+"
+  vue: "3+"
+  svelte: "4+"
+  vanilla: true
+code_examples:
+  react: |
+    import { useEffect, useRef, useState } from 'react';
+    import styles from './Timeline.module.css';
+
+    interface TimelineItem {
+      id: string;
+      date: string;
+      title: string;
+      description: string;
+    }
+
+    interface TimelineProps {
+      items: TimelineItem[];
+      alternating?: boolean;
+    }
+
+    export function Timeline({ items, alternating = true }: TimelineProps) {
+      const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
+      const itemRefs = useRef<Map<string, HTMLLIElement>>(new Map());
+
+      useEffect(() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setVisibleItems((prev) => new Set([...prev, entry.target.id]));
+              }
+            });
+          },
+          { threshold: 0.2 }
+        );
+
+        itemRefs.current.forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
+      }, [items]);
+
+      return (
+        <div className={styles.timeline}>
+          <div className={styles.line} />
+          <ol className={styles.list}>
+            {items.map((item, index) => (
+              <li
+                key={item.id}
+                id={item.id}
+                ref={(el) => el && itemRefs.current.set(item.id, el)}
+                className={`${styles.item} ${
+                  alternating && index % 2 === 1 ? styles.right : styles.left
+                } ${visibleItems.has(item.id) ? styles.visible : ''}`}
+              >
+                <div className={styles.marker} />
+                <div className={styles.content}>
+                  <time className={styles.date}>{item.date}</time>
+                  <h3 className={styles.title}>{item.title}</h3>
+                  <p className={styles.description}>{item.description}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      );
+    }
+
+    // Timeline.module.css
+    // .timeline { position: relative; padding: 2rem 0; }
+    // .line {
+    //   position: absolute;
+    //   left: 50%;
+    //   top: 0;
+    //   bottom: 0;
+    //   width: 2px;
+    //   background: #e5e5e5;
+    //   transform: translateX(-50%);
+    // }
+    // .list { list-style: none; padding: 0; margin: 0; }
+    // .item {
+    //   position: relative;
+    //   width: 50%;
+    //   padding: 1rem 2rem;
+    //   opacity: 0;
+    //   transform: translateY(20px);
+    //   transition: opacity 0.5s, transform 0.5s;
+    // }
+    // .item.visible { opacity: 1; transform: translateY(0); }
+    // .left { padding-right: 3rem; text-align: right; }
+    // .right { margin-left: 50%; padding-left: 3rem; }
+    // .marker {
+    //   position: absolute;
+    //   top: 1.5rem;
+    //   width: 12px;
+    //   height: 12px;
+    //   background: #000;
+    //   border-radius: 50%;
+    // }
+    // .left .marker { right: -6px; }
+    // .right .marker { left: -6px; }
+    // .date { font-size: 0.875rem; color: #666; }
+    // .title { margin: 0.5rem 0; }
+    // .description { margin: 0; color: #444; }
+    // @media (max-width: 768px) {
+    //   .line { left: 1rem; }
+    //   .item, .right { width: 100%; margin-left: 0; padding-left: 3rem; padding-right: 0; text-align: left; }
+    //   .left .marker, .right .marker { left: calc(1rem - 6px); right: auto; }
+    // }
+  vue: |
+    <template>
+      <div class="timeline">
+        <div class="timeline-line" />
+        <ol class="timeline-list">
+          <li
+            v-for="(item, index) in items"
+            :key="item.id"
+            :id="item.id"
+            :ref="(el) => el && setItemRef(item.id, el)"
+            :class="[
+              'timeline-item',
+              alternating && index % 2 === 1 ? 'right' : 'left',
+              { visible: visibleItems.has(item.id) }
+            ]"
+          >
+            <div class="timeline-marker" />
+            <div class="timeline-content">
+              <time class="timeline-date">{{ item.date }}</time>
+              <h3 class="timeline-title">{{ item.title }}</h3>
+              <p class="timeline-description">{{ item.description }}</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </template>
+
+    <script setup lang="ts">
+    import { ref, onMounted, onUnmounted } from 'vue';
+
+    interface TimelineItem {
+      id: string;
+      date: string;
+      title: string;
+      description: string;
+    }
+
+    const props = withDefaults(defineProps<{
+      items: TimelineItem[];
+      alternating?: boolean;
+    }>(), { alternating: true });
+
+    const visibleItems = ref(new Set<string>());
+    const itemRefs = new Map<string, Element>();
+    let observer: IntersectionObserver;
+
+    const setItemRef = (id: string, el: Element) => {
+      itemRefs.set(id, el);
+    };
+
+    onMounted(() => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              visibleItems.value = new Set([...visibleItems.value, entry.target.id]);
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+      itemRefs.forEach((el) => observer.observe(el));
+    });
+
+    onUnmounted(() => observer?.disconnect());
+    </script>
+
+    <style scoped>
+    .timeline { position: relative; padding: 2rem 0; }
+    .timeline-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e5e5;
+      transform: translateX(-50%);
+    }
+    .timeline-list { list-style: none; padding: 0; margin: 0; }
+    .timeline-item {
+      position: relative;
+      width: 50%;
+      padding: 1rem 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .timeline-item.visible { opacity: 1; transform: translateY(0); }
+    .left { padding-right: 3rem; text-align: right; }
+    .right { margin-left: 50%; padding-left: 3rem; }
+    .timeline-marker {
+      position: absolute;
+      top: 1.5rem;
+      width: 12px;
+      height: 12px;
+      background: #000;
+      border-radius: 50%;
+    }
+    .left .timeline-marker { right: -6px; }
+    .right .timeline-marker { left: -6px; }
+    .timeline-date { font-size: 0.875rem; color: #666; }
+    .timeline-title { margin: 0.5rem 0; }
+    .timeline-description { margin: 0; color: #444; }
+    @media (max-width: 768px) {
+      .timeline-line { left: 1rem; }
+      .timeline-item, .right { width: 100%; margin-left: 0; padding-left: 3rem; padding-right: 0; text-align: left; }
+      .left .timeline-marker, .right .timeline-marker { left: calc(1rem - 6px); right: auto; }
+    }
+    </style>
+  svelte: |
+    <script lang="ts">
+      import { onMount } from 'svelte';
+
+      interface TimelineItem {
+        id: string;
+        date: string;
+        title: string;
+        description: string;
+      }
+
+      export let items: TimelineItem[] = [];
+      export let alternating = true;
+
+      let visibleItems = new Set<string>();
+      let itemElements: HTMLLIElement[] = [];
+
+      onMount(() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                visibleItems = new Set([...visibleItems, entry.target.id]);
+              }
+            });
+          },
+          { threshold: 0.2 }
+        );
+
+        itemElements.forEach((el) => el && observer.observe(el));
+        return () => observer.disconnect();
+      });
+    </script>
+
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <ol class="timeline-list">
+        {#each items as item, index}
+          <li
+            id={item.id}
+            bind:this={itemElements[index]}
+            class="timeline-item {alternating && index % 2 === 1 ? 'right' : 'left'}"
+            class:visible={visibleItems.has(item.id)}
+          >
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <time class="timeline-date">{item.date}</time>
+              <h3 class="timeline-title">{item.title}</h3>
+              <p class="timeline-description">{item.description}</p>
+            </div>
+          </li>
+        {/each}
+      </ol>
+    </div>
+
+    <style>
+      .timeline { position: relative; padding: 2rem 0; }
+      .timeline-line {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e5e5e5;
+        transform: translateX(-50%);
+      }
+      .timeline-list { list-style: none; padding: 0; margin: 0; }
+      .timeline-item {
+        position: relative;
+        width: 50%;
+        padding: 1rem 2rem;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s, transform 0.5s;
+      }
+      .timeline-item.visible { opacity: 1; transform: translateY(0); }
+      .left { padding-right: 3rem; text-align: right; }
+      .right { margin-left: 50%; padding-left: 3rem; }
+      .timeline-marker {
+        position: absolute;
+        top: 1.5rem;
+        width: 12px;
+        height: 12px;
+        background: #000;
+        border-radius: 50%;
+      }
+      .left .timeline-marker { right: -6px; }
+      .right .timeline-marker { left: -6px; }
+      .timeline-date { font-size: 0.875rem; color: #666; }
+      .timeline-title { margin: 0.5rem 0; }
+      .timeline-description { margin: 0; color: #444; }
+      @media (max-width: 768px) {
+        .timeline-line { left: 1rem; }
+        .timeline-item, .right { width: 100%; margin-left: 0; padding-left: 3rem; padding-right: 0; text-align: left; }
+        .left .timeline-marker, .right .timeline-marker { left: calc(1rem - 6px); right: auto; }
+      }
+    </style>
+  vanilla: |
+    /* HTML */
+    <div class="timeline">
+      <div class="timeline__line"></div>
+      <ol class="timeline__list">
+        <li class="timeline__item left" id="event-1">
+          <div class="timeline__marker"></div>
+          <div class="timeline__content">
+            <time class="timeline__date">2020</time>
+            <h3 class="timeline__title">Company Founded</h3>
+            <p class="timeline__description">Started with a small team of 3 people.</p>
+          </div>
+        </li>
+        <li class="timeline__item right" id="event-2">
+          <div class="timeline__marker"></div>
+          <div class="timeline__content">
+            <time class="timeline__date">2021</time>
+            <h3 class="timeline__title">First Product Launch</h3>
+            <p class="timeline__description">Released our flagship product.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    /* CSS */
+    .timeline {
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    .timeline__line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e5e5;
+      transform: translateX(-50%);
+    }
+
+    .timeline__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .timeline__item {
+      position: relative;
+      width: 50%;
+      padding: 1rem 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .timeline__item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .timeline__item.left {
+      padding-right: 3rem;
+      text-align: right;
+    }
+
+    .timeline__item.right {
+      margin-left: 50%;
+      padding-left: 3rem;
+    }
+
+    .timeline__marker {
+      position: absolute;
+      top: 1.5rem;
+      width: 12px;
+      height: 12px;
+      background: #000;
+      border-radius: 50%;
+    }
+
+    .left .timeline__marker { right: -6px; }
+    .right .timeline__marker { left: -6px; }
+
+    .timeline__date {
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    .timeline__title {
+      margin: 0.5rem 0;
+    }
+
+    .timeline__description {
+      margin: 0;
+      color: #444;
+    }
+
+    @media (max-width: 768px) {
+      .timeline__line { left: 1rem; }
+      .timeline__item,
+      .timeline__item.right {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 3rem;
+        padding-right: 0;
+        text-align: left;
+      }
+      .left .timeline__marker,
+      .right .timeline__marker {
+        left: calc(1rem - 6px);
+        right: auto;
+      }
+    }
+
+    /* JavaScript */
+    function initTimeline() {
+      const items = document.querySelectorAll('.timeline__item');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+
+      items.forEach((item) => observer.observe(item));
+    }
+
+    document.addEventListener('DOMContentLoaded', initTimeline);
